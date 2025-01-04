@@ -45,11 +45,20 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/platform-e2e/**/*"]
+      "exclude": [
+        "apps/platform-e2e/**/*",
+        "packages/drizzle-e2e/**/*",
+        "apps/drizzle-e2e/**/*"
+      ]
     }
   ],
   "targetDefaults": {
     "@nx/js:tsc": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "@nx/esbuild:esbuild": {
       "cache": true,
       "dependsOn": ["^build"],
       "inputs": ["production", "^production"]

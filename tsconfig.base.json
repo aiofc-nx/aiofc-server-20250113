@@ -18,6 +18,10 @@
     "sourceMap": true,
     "skipDefaultLibCheck": true,
     "declaration": true,
-    "paths": {}
+    "paths": {
+      "@aiofc/drizzle-postgres-js": [
+        "packages/drizzle-postgres-js/src/index.ts"
+      ]
+    }
   }
 }
