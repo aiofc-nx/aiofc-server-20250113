@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2021",
     "importHelpers": true,
-    "module": "commonjs",
+    "module": "ES2022",
     "moduleResolution": "node",
     "outDir": "build",
     "experimentalDecorators": true,
