@@ -1,7 +1,7 @@
 {
-  "name": "drizzle",
+  "name": "drizzle-kits",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/drizzle/src",
+  "sourceRoot": "apps/drizzle-kits/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -13,15 +13,15 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/drizzle",
+        "outputPath": "dist/apps/drizzle-kits",
         "format": [
           "esm"
         ],
         "bundle": false,
-        "main": "apps/drizzle/src/main.ts",
-        "tsConfig": "apps/drizzle/tsconfig.app.json",
+        "main": "apps/drizzle-kits/src/main.ts",
+        "tsConfig": "apps/drizzle-kits/tsconfig.app.json",
         "assets": [
-          "apps/drizzle/src/assets"
+          "apps/drizzle-kits/src/assets"
         ],
         "generatePackageJson": true,
         "esbuildOptions": {
@@ -50,22 +50,22 @@
         "build"
       ],
       "options": {
-        "buildTarget": "drizzle:build",
+        "buildTarget": "drizzle-kits:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "drizzle:build:development"
+          "buildTarget": "drizzle-kits:build:development"
         },
         "production": {
-          "buildTarget": "drizzle:build:production"
+          "buildTarget": "drizzle-kits:build:production"
         }
       }
     },
     "db:generate-aiofc": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "drizzle-kit generate --config apps/drizzle/drizzle.aiofc.config.ts"
+        "command": "drizzle-kit generate --config apps/drizzle-kits/drizzle.aiofc.config.ts"
       }
     },
     "db:migrate": {

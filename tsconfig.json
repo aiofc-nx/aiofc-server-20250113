@@ -2,5 +2,9 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": [{ "path": "./packages/utils" }, { "path": "./apps/platform" }]
+  "references": [
+    { "path": "./packages/utils" },
+    { "path": "./apps/platform" },
+    { "path": "./packages/nestjs-drizzle" }
+  ]
 }

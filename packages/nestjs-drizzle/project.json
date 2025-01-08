@@ -1,7 +1,7 @@
 {
-  "name": "drizzle-postgres-js",
+  "name": "nestjs-drizzle",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "packages/drizzle-postgres-js/src",
+  "sourceRoot": "packages/nestjs-drizzle/src",
   "projectType": "library",
   "release": {
     "version": {
@@ -15,13 +15,17 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
-        "outputPath": "dist/packages/drizzle-postgres-js",
-        "tsConfig": "packages/drizzle-postgres-js/tsconfig.lib.json",
-        "packageJson": "packages/drizzle-postgres-js/package.json",
-        "main": "packages/drizzle-postgres-js/src/index.ts",
-        "assets": ["packages/drizzle-postgres-js/*.md"]
+        "outputPath": "dist/packages/nestjs-drizzle",
+        "tsConfig": "packages/nestjs-drizzle/tsconfig.lib.json",
+        "packageJson": "packages/nestjs-drizzle/package.json",
+        "main": "packages/nestjs-drizzle/src/index.ts",
+        "assets": [
+          "packages/nestjs-drizzle/*.md"
+        ]
       }
     },
     "nx-release-publish": {
