@@ -1,8 +1,8 @@
-import { Client, QueryResultRow } from 'pg';
+import postgres from 'postgres';
 import * as schema from '../entities/entities.schema';
 import { sql } from 'drizzle-orm';
-import { migrate } from 'drizzle-orm/pglite/migrator';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { drizzle } from 'drizzle-orm/postgres-js';
 
 /**
  * 数据库辅助工具类
@@ -34,15 +34,17 @@ export class DatabaseHelper {
     connectionString: string,
     schemaName: string,
   ): Promise<void> {
-    const client = new Client({ connectionString });
-    await client.connect();
+    const client = postgres(connectionString);
     const db = drizzle(client, { schema });
+
     await db.execute(sql.raw(`CREATE SCHEMA IF NOT EXISTS "${schemaName}"`));
     await db.execute(sql.raw(`SET schema '${schemaName}'`));
+
     await migrate(db, {
       migrationsFolder: migrationsFolderPath,
       migrationsSchema: schemaName,
     });
+
     await client.end();
   }
 
@@ -61,10 +63,11 @@ export class DatabaseHelper {
     connectionString: string,
     schemaName: string,
   ): Promise<void> {
-    const client = new Client({ connectionString });
-    await client.connect();
+    const client = postgres(connectionString);
     const db = drizzle(client, { schema });
+
     await db.execute(sql.raw(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE;`));
+
     await client.end();
   }
 
@@ -83,15 +86,16 @@ export class DatabaseHelper {
     connectionString: string,
     schemaName: string,
   ): Promise<boolean> {
-    const client = new Client({ connectionString });
-    await client.connect();
+    const client = postgres(connectionString);
     const db = drizzle(client, { schema });
-    const res = await db.execute(
+
+    const res = (await db.execute(
       sql.raw(
         `SELECT EXISTS (SELECT * FROM PG_CATALOG.PG_NAMESPACE WHERE NSPNAME = '${schemaName}');`,
       ),
-    );
+    )) as unknown as Array<{ exists: boolean }>;
+
     await client.end();
-    return (res.rows.at(-1)! as QueryResultRow).exists;
+    return res[0].exists;
   }
 }

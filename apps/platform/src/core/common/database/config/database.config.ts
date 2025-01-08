@@ -22,48 +22,8 @@ import { z } from 'zod';
 @Injectable()
 export class DatabaseConfig {
   /**
-   * 获取PostgreSQL连接字符串
-   *
-   * 机制:通过实例方法访问静态配置
-   */
-  get postgresqlConnection(): string {
-    return DatabaseConfig.postgresqlConnection;
-  }
-
-  /**
-   * 获取数据库Schema名称
-   *
-   * 机制:通过实例方法访问静态配置
-   */
-  get schemaName(): string {
-    return DatabaseConfig.schemaName;
-  }
-
-  /**
-   * 静态方法获取PostgreSQL连接字符串
-   *
-   * 机制:
-   * 1. 验证并获取环境变量配置
-   * 2. 构建标准连接URL
-   */
-  static get postgresqlConnection(): string {
-    const config = DatabaseConfig.validateConfiguration();
-    return `postgres://${config.DB_USER}:${config.DB_PASSWORD}@${config.DB_HOST_NAME}:${config.DB_PORT}/${config.DB_NAME}`;
-  }
-
-  /**
-   * 静态方法获取Schema名称
-   *
-   * 机制:从验证后的配置中获取Schema名称
-   */
-  static get schemaName(): string {
-    const config = DatabaseConfig.validateConfiguration();
-    return config.DB_SCHEMA_NAME;
-  }
-
-  /**
    * 验证环境变量配置
-   *
+   * 通过process.env获取环境变量，并使用zod验证
    * 机制说明:
    * 1. 使用Zod定义配置Schema
    * 2. 强制类型转换和验证
@@ -87,5 +47,41 @@ export class DatabaseConfig {
     });
 
     return envSchema.parse(process.env);
+  }
+  /**
+   * 静态方法获取Schema名称
+   *
+   * 机制:从验证后的配置中获取Schema名称
+   */
+  static get schemaName(): string {
+    const config = DatabaseConfig.validateConfiguration();
+    return config.DB_SCHEMA_NAME;
+  }
+  /**
+   * 获取PostgreSQL连接字符串
+   *
+   * 机制:通过实例方法访问静态配置
+   */
+  get postgresqlConnection(): string {
+    return DatabaseConfig.postgresqlConnection;
+  }
+  /**
+   * 获取数据库Schema名称
+   *
+   * 机制:通过实例方法访问静态配置
+   */
+  get schemaName(): string {
+    return DatabaseConfig.schemaName;
+  }
+  /**
+   * 静态方法获取PostgreSQL连接字符串
+   *
+   * 机制:
+   * 1. 验证并获取环境变量配置
+   * 2. 构建标准连接URL
+   */
+  static get postgresqlConnection(): string {
+    const config = DatabaseConfig.validateConfiguration();
+    return `postgres://${config.DB_USER}:${config.DB_PASSWORD}@${config.DB_HOST_NAME}:${config.DB_PORT}/${config.DB_NAME}`;
   }
 }

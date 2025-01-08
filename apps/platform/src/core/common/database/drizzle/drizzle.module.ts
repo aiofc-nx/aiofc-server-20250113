@@ -5,7 +5,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { PG_CONNECTION } from './pg-connection';
 import { EntitiesSchema } from '../entities/entities.schema';
 import { DatabaseConfig } from '../config/database.config';
-import { CustomDrizzleLoggingService } from '../../../logging/custom-logging/custom-drizzle-logging.service';
+import { CustomDrizzleLoggingService } from '../../../logging/custom-logging';
 /**
  * DrizzleModule - 数据库连接模块
  *
@@ -74,6 +74,7 @@ import { CustomDrizzleLoggingService } from '../../../logging/custom-logging/cus
         });
       },
     },
+    // TODO: 添加其他schema的连接
   ],
   exports: [PG_CONNECTION],
 })
