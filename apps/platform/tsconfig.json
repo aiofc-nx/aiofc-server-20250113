@@ -2,12 +2,14 @@
   "extends": "../../tsconfig.base.json",
   "files": [],
   "include": [],
-  "references": [
-    { "path": "../../packages/utils" },
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.spec.json" }
-  ],
+  "references": [{ "path": "./tsconfig.app.json" }],
   "compilerOptions": {
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "composite": true,
+    "declaration": true,
+    "paths": {
+      "@api/*": ["src/api/*"],
+      "@core/*": ["src/core/*"]
+    }
   }
 }
