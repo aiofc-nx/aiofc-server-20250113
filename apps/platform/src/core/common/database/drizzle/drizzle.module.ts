@@ -18,10 +18,14 @@ export class DrizzleModule {
         DrizzleService,
         {
           provide: PG_CONNECTION,
-          useFactory: async (drizzleService: DrizzleService) => {
-            return drizzleService.getDrizzle(config);
+          useFactory: async (
+            drizzleService: DrizzleService,
+            tenantContext: TenantContextService,
+          ) => {
+            const tenantId = tenantContext.getTenantId();
+            return drizzleService.getDrizzle(config, tenantId);
           },
-          inject: [DrizzleService],
+          inject: [DrizzleService, TenantContextService],
         },
       ],
       exports: [DrizzleService, PG_CONNECTION],
@@ -55,22 +59,9 @@ export class DrizzleModule {
           ) => {
             const tenantId = tenantContext.getTenantId();
             if (!tenantId) {
-              throw new Error('Tenant ID is required for database operations');
+              throw new Error('Tenant ID is required');
             }
-
-            const schemaName = `tenant_${tenantId}`;
-            // 先验证 schema 是否存在
-            await drizzleService.validateSchema(schemaName);
-
-            // 然后创建带有正确 schema 的连接
-            const url = `${config.postgres.url}?options=-c%20search_path=${schemaName}`;
-            return drizzleService.getDrizzle({
-              ...config,
-              postgres: {
-                ...config.postgres,
-                url,
-              },
-            });
+            return drizzleService.getDrizzle(config, tenantId);
           },
           inject: [DrizzleService, 'DRIZZLE_OPTIONS', TenantContextService],
         },
