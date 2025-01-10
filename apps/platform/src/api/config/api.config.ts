@@ -36,8 +36,8 @@ export class ApiConfig {
    * - 从环境变量读取端口配置
    * - 返回字符串类型便于直接使用
    */
-  get getApiPortNumber(): string {
-    return this.configService.get<string>('API_PORT');
+  get getApiPortNumber(): number {
+    return this.configService.get<number>('API_PORT');
   }
 
   /**
@@ -48,7 +48,7 @@ export class ApiConfig {
    * - 支持自定义前缀设置
    */
   get globalPrefix(): string {
-    return this.configService.get<string>('API_GLOBAL_PREFIX') || 'api';
+    return this.configService.get<string>('API_GLOBAL_PREFIX');
   }
 
   /**

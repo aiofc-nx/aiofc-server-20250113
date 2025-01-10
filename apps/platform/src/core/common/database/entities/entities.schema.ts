@@ -1,4 +1,4 @@
-import * as jobsSchema from '../../database/entities/job/job.entity';
+import * as jobsSchema from '../entities/job/job.entity';
 
 /**
  * 实体Schema聚合对象
@@ -17,7 +17,7 @@ import * as jobsSchema from '../../database/entities/job/job.entity';
  * 2. 通过展开运算符将所有Schema合并到一个对象中
  * 3. 导出统一的EntitiesSchema供系统使用
  */
-export const EntitiesSchema = { ...jobsSchema };
+export const EntitiesSchema: Record<string, unknown> = { ...jobsSchema };
 
 /**
  * 示例：

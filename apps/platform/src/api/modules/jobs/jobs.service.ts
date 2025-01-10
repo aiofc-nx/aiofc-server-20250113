@@ -79,6 +79,7 @@ export class JobsService {
    * - 返回完整的实体数组
    */
   async getAllJobs(): Promise<JobEntity[]> {
+    console.log('getAllJobs-service');
     return this.jobDao.getAll();
   }
 

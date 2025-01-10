@@ -1,10 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { AbstractDao } from '../abstract.dao';
-import { JobEntity, JobEntityInsert, jobs } from './job.entity';
-import { PG_CONNECTION } from '../../drizzle/pg-connection';
 import { DatabaseConfig } from '../../config/database.config';
-import * as jobsSchema from '../../../database/entities/job/job.entity';
+import { PG_CONNECTION } from '../../drizzle/pg-connection';
+import { AbstractDao } from '../../entities/abstract.dao';
+import * as schemas from '../../entities/job/job.entity';
+import {
+  JobEntity,
+  JobEntityInsert,
+  jobs,
+} from '../../entities/job/job.entity';
+
 /**
  * Job数据访问对象
  * Dao属于数据访问层（Data Access Layer），负责与数据库进行交互，相当于typeorm的Repository
@@ -33,14 +38,17 @@ import * as jobsSchema from '../../../database/entities/job/job.entity';
  */
 @Injectable()
 export class JobDao extends AbstractDao<
-  typeof jobsSchema,
+  {
+    jobs: typeof jobs;
+    // jobLogs: typeof jobLogs;
+  },
   typeof jobs,
   JobEntity,
   JobEntityInsert
 > {
   constructor(
     @Inject(PG_CONNECTION)
-    protected readonly db: PostgresJsDatabase<typeof jobsSchema>,
+    protected readonly db: PostgresJsDatabase<typeof schemas>,
     protected readonly dbConfig: DatabaseConfig,
   ) {
     super(db, jobs, dbConfig);

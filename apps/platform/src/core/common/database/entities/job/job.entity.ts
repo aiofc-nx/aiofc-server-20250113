@@ -29,9 +29,7 @@ export const jobs = pgTable(
     name: varchar('name', { length: 256 }),
     ...WithModificationDates,
   },
-  (jobs) => ({
-    nameIdx: index('name_idx').on(jobs.name),
-  }),
+  (jobs) => [index('name_idx').on(jobs.name)],
 );
 
 /**

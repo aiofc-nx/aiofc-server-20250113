@@ -6,9 +6,11 @@ import {
   Param,
   Post,
   Put,
+  Patch,
 } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { JobResponseDto } from './dtos/job-response.dto';
+import { z } from 'zod';
 
 /**
  * Jobs控制器
@@ -31,7 +33,7 @@ export class JobsController {
    * - 返回工作DTO数组
    */
   @Get()
-  async getAllJobs(): Promise<JobResponseDto[]> {
+  async getAllJobs(): Promise<z.infer<typeof JobResponseDto.schema>[]> {
     return this.jobsService.getAllJobs();
   }
 
@@ -40,14 +42,14 @@ export class JobsController {
    *
    * 要点:
    * - 使用@Post()装饰器处理POST请求
-   * - @Body()装饰器从请求体获取jobName
-   * - 返回部分工作DTO信息
+   * - 使用DTO验证请求数据
    */
   @Post()
   async addJob(
-    @Body('jobName') jobName: string,
-  ): Promise<Partial<JobResponseDto>> {
-    return this.jobsService.addJob(jobName);
+    @Body() jobData: unknown,
+  ): Promise<z.infer<typeof JobResponseDto.schema>> {
+    const validatedData = JobResponseDto.validate(jobData);
+    return this.jobsService.addJob(validatedData.name);
   }
 
   /**
@@ -58,7 +60,9 @@ export class JobsController {
    * - @Param()装饰器获取URL参数
    */
   @Get(':id')
-  async getById(@Param('id') jobId: string): Promise<JobResponseDto> {
+  async getById(
+    @Param('id') jobId: string,
+  ): Promise<z.infer<typeof JobResponseDto.schema>> {
     return this.jobsService.getById(jobId);
   }
 
@@ -67,14 +71,31 @@ export class JobsController {
    *
    * 要点:
    * - 使用@Put(':id')处理PUT请求
-   * - 同时使用URL参数和请求体参数
+   * - 使用DTO验证完整的请求数据
    */
   @Put(':id')
   async updateJob(
     @Param('id') jobId: string,
-    @Body('jobName') jobName: string,
-  ): Promise<Partial<JobResponseDto>[]> {
-    return this.jobsService.updateJob(jobId, jobName);
+    @Body() jobData: unknown,
+  ): Promise<z.infer<typeof JobResponseDto.schema>[]> {
+    const validatedData = JobResponseDto.validate(jobData);
+    return this.jobsService.updateJob(jobId, validatedData.name);
+  }
+
+  /**
+   * 部分更新工作信息
+   *
+   * 要点:
+   * - 使用@Patch(':id')处理PATCH请求
+   * - 使用DTO的partial验证进行部分更新
+   */
+  @Patch(':id')
+  async partialUpdateJob(
+    @Param('id') jobId: string,
+    @Body() jobData: unknown,
+  ): Promise<z.infer<typeof JobResponseDto.schema>[]> {
+    const validatedData = JobResponseDto.validatePartial(jobData);
+    return this.jobsService.updateJob(jobId, validatedData.name ?? '');
   }
 
   /**
@@ -87,7 +108,7 @@ export class JobsController {
   @Delete(':id')
   async deleteJob(
     @Param('id') jobId: string,
-  ): Promise<Partial<JobResponseDto>[]> {
+  ): Promise<z.infer<typeof JobResponseDto.schema>[]> {
     return this.jobsService.deleteJob(jobId);
   }
 
@@ -99,7 +120,7 @@ export class JobsController {
    * - 清空整个工作列表
    */
   @Delete()
-  async deleteAllJobs(): Promise<Partial<JobResponseDto>[]> {
+  async deleteAllJobs(): Promise<z.infer<typeof JobResponseDto.schema>[]> {
     return this.jobsService.deleteJobs();
   }
 }

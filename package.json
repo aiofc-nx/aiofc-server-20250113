@@ -84,6 +84,7 @@
   },
   "dependencies": {
     "@aiofc/utils": "workspace:*",
+    "@aiofc/drizzle-schema": "workspace:*",
     "@faker-js/faker": "^9.3.0",
     "@fastify/helmet": "^11.0.0",
     "@fastify/static": "^7.0.4",

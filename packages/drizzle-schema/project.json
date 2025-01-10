@@ -1,0 +1,48 @@
+{
+  "name": "drizzle-schema",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/drizzle-schema/src",
+  "projectType": "library",
+  "release": {
+    "version": {
+      "generatorOptions": {
+        "packageRoot": "dist/{projectRoot}",
+        "currentVersionResolver": "git-tag"
+      }
+    }
+  },
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/packages/drizzle-schema",
+        "main": "packages/drizzle-schema/src/index.ts",
+        "tsConfig": "packages/drizzle-schema/tsconfig.lib.json",
+        "assets": [
+          "packages/drizzle-schema/*.md"
+        ]
+      }
+    },
+    "nx-release-publish": {
+      "options": {
+        "packageRoot": "dist/{projectRoot}"
+      }
+    },
+    "db-aiofc:generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "drizzle-kit generate --config packages/drizzle-schema/src/config/aiofc.config.ts"
+      }
+    },
+    "db-aiofc:migrate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cross-env NODE_OPTIONS='--import tsx' DB_MIGRATING=true node packages/drizzle-schema/src/command/aiofc.migrate.ts"
+      }
+    }
+  }
+}

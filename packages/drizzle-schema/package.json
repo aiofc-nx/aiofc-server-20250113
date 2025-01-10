@@ -1,0 +1,15 @@
+{
+  "name": "@aiofc/drizzle-schema",
+  "version": "0.0.1",
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "drizzle-orm": "^0.38.3",
+    "drizzle-kit": "^0.30.1",
+    "dotenv": "^16.4.7",
+    "dotenv-expand": "^12.0.1",
+    "zod": "^3.24.1",
+    "postgres": "^3.4.5"
+  },
+  "type": "commonjs",
+  "typings": "./src/index.d.ts"
+}

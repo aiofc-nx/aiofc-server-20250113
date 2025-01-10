@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { eq, Table } from 'drizzle-orm';
+import { eq, InferInsertModel, Table } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DatabaseConfig } from '../config/database.config';
 import { PG_CONNECTION } from '../drizzle/pg-connection';
@@ -25,7 +25,7 @@ export class AbstractDao<
   TSchema extends Record<string, unknown>,
   Entity extends Table,
   InferEntitySelected,
-  InferEntityInsert extends Record<string, unknown>,
+  InferEntityInsert,
 > {
   // 在构造函数所做的事情，包括：
   // 获取数据库连接字符串（通过配置），创建数据库连接，创建drizzle客户端
@@ -42,7 +42,7 @@ export class AbstractDao<
    *
    * 机制:通过useDynamicSchema工具函数动态切换数据库schema
    */
-  protected get useSchema() {
+  protected get useTable() {
     return useDynamicSchema(this.entity, this.dbConfig.schemaName);
   }
 
@@ -54,7 +54,7 @@ export class AbstractDao<
    * 2. 从动态schema中获取数据
    */
   async getAll() {
-    return this.db.select().from(this.useSchema).execute();
+    return this.db.select().from(this.useTable).execute();
   }
 
   /**
@@ -71,7 +71,7 @@ export class AbstractDao<
     const selectedFields = this.selectFields(fieldsToSelect);
     return this.db
       .select(selectedFields)
-      .from(this.useSchema)
+      .from(this.useTable)
       .where(eq(this.entity['id'], id));
   }
 
@@ -105,7 +105,7 @@ export class AbstractDao<
     const selectedFields = this.selectFields(fieldsToSelect);
     return await this.db
       .select(selectedFields)
-      .from(this.useSchema)
+      .from(this.useTable)
       .where(eq(this.entity[key as string], value))
       .execute();
   }
@@ -138,8 +138,8 @@ export class AbstractDao<
     entity: Partial<InferEntityInsert>,
   ): Promise<Partial<InferEntitySelected>> {
     const insertedRows = await this.db
-      .insert(this.useSchema)
-      .values(entity as InferEntityInsert)
+      .insert(this.useTable)
+      .values(entity as InferInsertModel<Entity>)
       .returning()
       .execute();
     return Array.isArray(insertedRows) && insertedRows.length === 1
@@ -156,7 +156,7 @@ export class AbstractDao<
    */
   async deleteById(id: string) {
     return this.db
-      .delete(this.useSchema)
+      .delete(this.useTable)
       .where(eq(this.entity['id'], id))
       .returning()
       .execute();
@@ -175,7 +175,7 @@ export class AbstractDao<
     fieldsToUpdate: Partial<InferEntityInsert>,
   ): Promise<Partial<InferEntitySelected>[]> {
     return (await this.db
-      .update(this.useSchema)
+      .update(this.useTable)
       .set(fieldsToUpdate as InferEntityInsert)
       .where(eq(this.entity['id'], id))
       .returning()
@@ -190,7 +190,7 @@ export class AbstractDao<
    * - returning()返回所有被删除的记录
    */
   async deleteAll() {
-    return this.db.delete(this.useSchema).returning().execute();
+    return this.db.delete(this.useTable).returning().execute();
   }
 
   /**

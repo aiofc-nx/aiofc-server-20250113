@@ -22,6 +22,7 @@
       "@aiofc/drizzle-postgres-js": [
         "packages/drizzle-postgres-js/src/index.ts"
       ],
+      "@aiofc/drizzle-schema": ["packages/drizzle-schema/src/index.ts"],
       "@aiofc/utils": ["packages/utils/src/index.ts"]
     }
   }
