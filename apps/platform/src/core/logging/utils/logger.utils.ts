@@ -17,7 +17,9 @@ export class LoggerUtils {
    * Uses the TRACKING_ID_HEADER, if present, otherwise generates a random UUID.
    */
   static generateLoggingIdForHttpContext(req: IncomingMessage): string {
-    return  (req?.headers?.[process.env.TRACKING_ID_HEADER] as string) || randomUUID();
+    return (
+      (req?.headers?.[process.env.TRACKING_ID_HEADER] as string) || randomUUID()
+    );
   }
 
   static pinoPrettyLogger(options?: PrettyOptions): BaseLogger {
@@ -47,20 +49,26 @@ export class LoggerUtils {
       minimumLevel: 'info',
       singleLine: true,
       translateTime: true,
-      // Useful to increase readability (fewer chars to read), for example, in AWS Cloudwatch/Google Logs/Azure...
       colorize: true,
       levelFirst: true,
-      ignore: 'pid,hostname,req,res,reqId,responseTime,context',
-      messageFormat: `[{reqId}] {msg} [{context}]`,
+      ignore: 'pid,hostname,req,res,reqId,responseTime',
+      messageFormat: `[{tenantId}] [{reqId}] {msg} [{context}]`,
       sync: true,
     };
   }
 
   static customReceivedMessage(req: FastifyRequest): string {
-    return `---> ${req.method} to '${req.originalUrl}'`;
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default';
+    return `[${tenantId}] ->> ${req.method} to '${req.originalUrl}'`;
   }
 
-  static customResponseMessage(req: FastifyRequest, res: FastifyReply, elapsedTime?: number, statusCode?: number): string {
-    return `<--- ${req.method} to '${req.originalUrl}' - ${statusCode ?? res.statusCode} after ${Math.ceil(elapsedTime ?? res.elapsedTime)}ms`;
+  static customResponseMessage(
+    req: FastifyRequest,
+    res: FastifyReply,
+    elapsedTime?: number,
+    statusCode?: number,
+  ): string {
+    const tenantId = (req.headers['x-tenant-id'] as string) || 'default';
+    return `<<- [${tenantId}] ${req.method} to '${req.originalUrl}' - ${statusCode ?? res.statusCode} after ${Math.ceil(elapsedTime ?? res.elapsedTime)}ms`;
   }
 }

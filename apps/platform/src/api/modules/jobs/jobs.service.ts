@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import {
   JobEntity,
   JobEntityInsert,
@@ -29,6 +29,8 @@ import { JobDao } from '../../../core/common/database/entities/job/job.dao';
  */
 @Injectable()
 export class JobsService {
+  private readonly logger = new Logger(JobsService.name);
+
   // 这里注入了数据访问层的DAO (Data Access Object)，用于与数据库进行交互，相当于typeorm的Repository
   constructor(private readonly jobDao: JobDao) {}
 
@@ -53,6 +55,11 @@ export class JobsService {
    * - 类型转换确保返回正确的实体类型
    */
   async getById(id: string): Promise<JobEntity> {
+    if (!id) {
+      throw new BadRequestException('Job ID is required');
+    }
+
+    this.logger.log(`Getting job by ID: ${id}`);
     return (await this.jobDao.getOneById(id, [
       'id',
       'createdAt',
@@ -69,6 +76,9 @@ export class JobsService {
    * - 返回更新后的记录数组
    */
   async updateJob(id: string, newName: string): Promise<JobEntityInsert[]> {
+    if (!id) {
+      throw new BadRequestException('Job ID is required');
+    }
     return this.jobDao.updateById(id, { name: newName });
   }
 
@@ -79,7 +89,7 @@ export class JobsService {
    * - 返回完整的实体数组
    */
   async getAllJobs(): Promise<JobEntity[]> {
-    console.log('getAllJobs-service');
+    this.logger.log('获得所有工作事项');
     return this.jobDao.getAll();
   }
 
@@ -91,6 +101,9 @@ export class JobsService {
    * - 返回受影响的记录数组
    */
   async deleteJob(id: string): Promise<JobEntityInsert[]> {
+    if (!id) {
+      throw new BadRequestException('Job ID is required');
+    }
     return await this.jobDao.deleteById(id);
   }
 
