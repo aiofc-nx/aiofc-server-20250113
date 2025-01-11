@@ -2,7 +2,7 @@ import { Inject } from '@nestjs/common';
 import { eq, InferInsertModel, Table } from 'drizzle-orm';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DatabaseConfig } from '../config/database.config';
-import { PG_CONNECTION } from '../drizzle/pg-connection';
+import { PG_CONNECTION } from '../drizzle/drizzle.constants';
 
 /**
  * 抽象数据访问对象基类

@@ -1,15 +1,17 @@
-import { DynamicModule, Module, Scope } from '@nestjs/common';
+import { DynamicModule, Module, Global, Scope } from '@nestjs/common';
 import { DrizzleService } from './drizzle.service';
 import { DrizzleModuleConfig } from './drizzle.interface';
-import { PG_CONNECTION } from './pg-connection';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PG_CONNECTION } from './drizzle.constants';
 import { TenantContextService } from '../../tenant/tenant-context.service';
 import { TenantModule } from '../../tenant/tenant.module';
 
+@Global()
+@Module({})
 export class DrizzleModule {
-  static register(config: DrizzleModuleConfig): DynamicModule {
+  static forRoot(config: DrizzleModuleConfig): DynamicModule {
     return {
       module: DrizzleModule,
+      imports: [TenantModule],
       providers: [
         {
           provide: 'DRIZZLE_OPTIONS',
@@ -18,21 +20,28 @@ export class DrizzleModule {
         DrizzleService,
         {
           provide: PG_CONNECTION,
+          scope: Scope.REQUEST,
           useFactory: async (
             drizzleService: DrizzleService,
             tenantContext: TenantContextService,
           ) => {
             const tenantId = tenantContext.getTenantId();
+            if (!tenantId) {
+              throw new Error('Tenant ID is required');
+            }
+            const schemaName = `tenant_${tenantId}`;
+            await drizzleService.validateSchema(schemaName);
             return drizzleService.getDrizzle(config, tenantId);
           },
           inject: [DrizzleService, TenantContextService],
         },
       ],
       exports: [DrizzleService, PG_CONNECTION],
+      global: true,
     };
   }
 
-  static registerAsync(options: {
+  static forRootAsync(options: {
     imports?: any[];
     useFactory: (
       ...args: any[]
@@ -61,12 +70,15 @@ export class DrizzleModule {
             if (!tenantId) {
               throw new Error('Tenant ID is required');
             }
+            const schemaName = `tenant_${tenantId}`;
+            await drizzleService.validateSchema(schemaName);
             return drizzleService.getDrizzle(config, tenantId);
           },
           inject: [DrizzleService, 'DRIZZLE_OPTIONS', TenantContextService],
         },
       ],
       exports: [DrizzleService, PG_CONNECTION],
+      global: true,
     };
   }
 }

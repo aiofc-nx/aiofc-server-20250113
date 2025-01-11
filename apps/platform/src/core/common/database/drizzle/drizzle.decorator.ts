@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { PG_CONNECTION } from './pg-connection';
+import { PG_CONNECTION } from './drizzle.constants';
 
 /**
  * Drizzle注入装饰器

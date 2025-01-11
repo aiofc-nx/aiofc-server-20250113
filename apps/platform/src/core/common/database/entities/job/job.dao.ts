@@ -1,9 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { DatabaseConfig } from '../../config/database.config';
-import { PG_CONNECTION } from '../../drizzle/pg-connection';
 import { AbstractDao } from '../../entities/abstract.dao';
-import * as schemas from '../../entities/job/job.entity';
 import {
   JobEntity,
   JobEntityInsert,
