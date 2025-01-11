@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { ApiModule } from './api.module';
-import { ApiConfig } from './config/api.config';
 import { LoggerUtils } from '../core/logging/utils/logger.utils';
 import { CustomLoggingService } from '../core/logging/custom-logging/custom-logging.service';
 import { CustomLoggingInterceptor } from '../core/logging/custom-logging/custom-logging.interceptor';
 import { ClsService } from 'nestjs-cls';
+import { ConfigService } from '@nestjs/config';
 
 /**
  * 应用程序引导函数
@@ -43,10 +43,10 @@ async function bootstrap() {
   // 启用跨域资源共享
   app.enableCors();
   // 设置全局路由前缀
-  const apiConfig = app.get(ApiConfig);
-  app.setGlobalPrefix(apiConfig.globalPrefix);
+  const configService = app.get<ConfigService>(ConfigService);
+  app.setGlobalPrefix(configService.get<string>('api.globalPrefix'));
   // 启动 HTTP 服务器
-  await app.listen(apiConfig.getApiPortNumber);
+  await app.listen(configService.get<number>('api.port'));
 }
 
 void bootstrap();
