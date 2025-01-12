@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
 import { LoggerUtils } from '../core/logger/utils/logger.utils';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { TenantMiddleware } from '../core/common/tenant/tenant.middleware';
@@ -75,7 +75,7 @@ const loggerOptions: PrettyOptions = {
   ],
   exports: [PinoLoggerService, DrizzleLoggerService],
 })
-export class ApiModule implements NestModule {
+export class ApiModule implements NestModule, OnModuleInit {
   constructor(
     private readonly appConfig: AppConfig,
     private readonly logger: PinoLoggerService,
