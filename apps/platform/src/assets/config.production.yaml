@@ -1,0 +1,14 @@
+database:
+  user: postgres
+  password: postgres
+  host: localhost
+  port: 5438
+  name: aiofc_db
+  schema: aiofc
+  pool:
+    max: 20
+    min: 2
+
+api:
+  port: 4000
+  globalPrefix: api

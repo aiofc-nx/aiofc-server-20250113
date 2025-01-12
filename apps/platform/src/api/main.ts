@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { ApiModule } from './api.module';
-import { ApiConfig } from './config/api.config';
-import { LoggerUtils } from '../core/logging/utils/logger.utils';
-import { CustomLoggingService } from '../core/logging/custom-logging/custom-logging.service';
-import { CustomLoggingInterceptor } from '../core/logging/custom-logging/custom-logging.interceptor';
+import { LoggerUtils } from '../core/logger/utils/logger.utils';
+import { PinoLoggerService } from '../core/logger/core/pino-logger.service';
+import { LoggerInterceptor } from '../core/logger/core/logger.interceptor';
 import { ClsService } from 'nestjs-cls';
+import { AppConfig } from '../config/app-config.service';
 
 /**
  * 应用程序引导函数
@@ -35,18 +35,16 @@ async function bootstrap() {
   // 创建 NestJS 应用，使用 Fastify 适配器
   const app = await NestFactory.create(ApiModule, adapter);
   // 使用自定义日志服务
-  app.useLogger(app.get(CustomLoggingService));
+  app.useLogger(app.get(PinoLoggerService));
   // 使用自定义日志拦截器，实现请求日志
-  app.useGlobalInterceptors(
-    ...[new CustomLoggingInterceptor(app.get(ClsService))],
-  );
+  app.useGlobalInterceptors(...[new LoggerInterceptor(app.get(ClsService))]);
   // 启用跨域资源共享
   app.enableCors();
   // 设置全局路由前缀
-  const apiConfig = app.get(ApiConfig);
-  app.setGlobalPrefix(apiConfig.globalPrefix);
+  const appConfig = app.get<AppConfig>(AppConfig);
+  app.setGlobalPrefix(appConfig.api.globalPrefix);
   // 启动 HTTP 服务器
-  await app.listen(apiConfig.getApiPortNumber);
+  await app.listen(appConfig.api.port);
 }
 
 void bootstrap();

@@ -48,7 +48,8 @@
       "exclude": [
         "apps/platform-e2e/**/*",
         "packages/drizzle-e2e/**/*",
-        "apps/drizzle-e2e/**/*"
+        "apps/drizzle-e2e/**/*",
+        "packages/saas-e2e/**/*"
       ]
     }
   ],

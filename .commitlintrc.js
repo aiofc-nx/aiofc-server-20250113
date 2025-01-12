@@ -1,3 +1,4 @@
+// @ts-nocheck
 const {
   utils: { getProjects },
 } = require('@commitlint/config-nx-scopes');

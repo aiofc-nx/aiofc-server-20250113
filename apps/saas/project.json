@@ -1,7 +1,7 @@
 {
-  "name": "plateform",
+  "name": "saas",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/platform/src",
+  "sourceRoot": "apps/saas/src",
   "projectType": "application",
   "tags": [],
   "targets": {
@@ -12,15 +12,15 @@
         "build"
       ],
       "options": {
-        "buildTarget": "plateform:build",
+        "buildTarget": "saas:build",
         "runBuildTargetDependencies": false
       },
       "configurations": {
         "development": {
-          "buildTarget": "plateform:build:development"
+          "buildTarget": "saas:build:development"
         },
         "production": {
-          "buildTarget": "plateform:build:production"
+          "buildTarget": "saas:build:production"
         }
       }
     }
