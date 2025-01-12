@@ -9,11 +9,7 @@ const jobResponseSchema = z.object({
     .max(256, '任务名称不能超过256个字符'),
 });
 
-export class JobResponseDto
-  extends BaseDto<typeof jobResponseSchema>
-  implements Pick<JobEntity, 'name'>
-{
+export class JobResponseDto extends BaseDto implements Pick<JobEntity, 'name'> {
   name!: string;
-
   public static override schema = jobResponseSchema;
 }
