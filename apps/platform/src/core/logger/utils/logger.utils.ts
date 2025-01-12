@@ -1,25 +1,53 @@
-import { randomUUID } from 'crypto';
-import { IncomingMessage } from 'http';
 import { FastifyRequest, FastifyServerOptions } from 'fastify';
 import pino, { BaseLogger } from 'pino';
 import pretty, { PrettyOptions } from 'pino-pretty';
 import { FastifyReply } from 'fastify/types/reply';
+import { randomUUID } from 'crypto';
+import { AppConfig } from '../../../config/app-config.service';
+import { IncomingMessage } from 'http';
 
 export class LoggerUtils {
+  private static _appConfig: AppConfig;
+
+  public static setAppConfig(config: AppConfig) {
+    this._appConfig = config;
+  }
+
+  public static get appConfig(): AppConfig {
+    if (!this._appConfig) {
+      // 提供默认值，避免未初始化时的错误
+      return {
+        logger: {
+          trackingIdHeader: 'x-tracking-id',
+        },
+      } as AppConfig;
+    }
+    return this._appConfig;
+  }
+
+  static getLogger(): BaseLogger {
+    return LoggerUtils.pinoPrettyLogger(LoggerUtils.basePinoPrettyOptions());
+  }
+
   static get defaultFastifyAdapterLogger(): FastifyServerOptions {
+    if (!LoggerUtils.appConfig) {
+      console.warn(
+        'LoggerUtils not initialized, using default tracking header',
+      );
+    }
     return {
       logger: false,
-      genReqId: (req) => LoggerUtils.generateLoggingIdForHttpContext(req),
+      genReqId: (req) => LoggerUtils.generateLoggerIdForHttpContext(req),
     };
   }
 
   /**
-   * Uses the TRACKING_ID_HEADER, if present, otherwise generates a random UUID.
+   * 使用 TRACKING_ID_HEADER（如果存在），否则生成随机 UUID。
    */
-  static generateLoggingIdForHttpContext(req: IncomingMessage): string {
-    return (
-      (req?.headers?.[process.env.TRACKING_ID_HEADER] as string) || randomUUID()
-    );
+  static generateLoggerIdForHttpContext(req: IncomingMessage): string {
+    const headerName =
+      this.appConfig.logger.trackingIdHeader || 'x-tracking-id';
+    return (req.headers[headerName] as string) || randomUUID();
   }
 
   static pinoPrettyLogger(options?: PrettyOptions): BaseLogger {
@@ -30,14 +58,14 @@ export class LoggerUtils {
     return pino(pretty(pinoPrettyOptions));
   }
 
-  static microserviceLoggingOptions(): PrettyOptions {
+  static microserviceLoggerOptions(): PrettyOptions {
     return {
       sync: true,
       minimumLevel: 'debug',
     } satisfies PrettyOptions;
   }
 
-  static httpLoggingOptions(): PrettyOptions {
+  static httpLoggerOptions(): PrettyOptions {
     return {
       sync: false,
       minimumLevel: 'debug',

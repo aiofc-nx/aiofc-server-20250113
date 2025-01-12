@@ -15,4 +15,4 @@
  * - 字符串类型明确声明
  * - 命名清晰表达用途
  */
-export const CUSTOM_LOGGING_OPTIONS_PROVIDER = 'CUSTOM_LOGGING_OPTIONS';
+export const PINO_LOGGER_OPTIONS_PROVIDER = 'PINO_LOGGER_OPTIONS';

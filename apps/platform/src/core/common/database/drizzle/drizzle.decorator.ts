@@ -1,5 +1,5 @@
 import { Inject } from '@nestjs/common';
-import { PG_CONNECTION } from './drizzle.constants';
+import { TENANT_PG_CONNECTION } from './drizzle.constants';
 
 /**
  * Drizzle注入装饰器
@@ -20,4 +20,4 @@ import { PG_CONNECTION } from './drizzle.constants';
  * - 通过闭包保存注入标识符
  * - 复用NestJS原生注入机制
  */
-export const InjectDrizzle = (tag = PG_CONNECTION) => Inject(tag);
+export const InjectDrizzle = (tag = TENANT_PG_CONNECTION) => Inject(tag);

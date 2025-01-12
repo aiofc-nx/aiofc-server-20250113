@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { DatabaseConfig } from '../../config/database.config';
 import { AbstractDao } from '../../entities/abstract.dao';
 import {
   JobEntity,
@@ -18,8 +17,7 @@ export class JobDao extends AbstractDao<
   constructor(
     @InjectDrizzle()
     protected readonly db: PostgresJsDatabase,
-    protected readonly dbConfig: DatabaseConfig,
   ) {
-    super(db, jobs, dbConfig);
+    super(db, jobs);
   }
 }

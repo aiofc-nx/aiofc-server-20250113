@@ -1,59 +1,91 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CustomLoggingModule } from '../core/logging/custom-logging/custom-logging.module';
-import { LoggerUtils } from '../core/logging/utils/logger.utils';
+import { LoggerUtils } from '../core/logger/utils/logger.utils';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { TenantMiddleware } from '../core/common/tenant/tenant.middleware';
 import { TenantContextService } from '../core/common/tenant/tenant-context.service';
-import { ClsModule, ClsMiddleware } from 'nestjs-cls';
+import { ClsMiddleware, ClsModule, ClsService } from 'nestjs-cls';
 import { DrizzleModule } from '../core/common/database/drizzle/drizzle.module';
 import { EntitiesSchema } from '../core/common/database/entities/entities.schema';
-// import { envValidate } from '../config/env.config';
-import configuration from '../config/configuration';
+import {
+  DrizzleLoggerService,
+  PINO_LOGGER_OPTIONS_PROVIDER,
+  PinoLoggerService,
+} from '../core/logger/core';
+import { PrettyOptions } from 'pino-pretty';
+import { AppConfig } from '../config/app-config.service';
+import { ZodConfigModule } from '../config/zod-config.module';
+import { PinoLoggerModule } from '../core/logger/core/pino-logger.module';
+
+const loggerOptions: PrettyOptions = {
+  colorize: true,
+  levelFirst: true,
+};
 
 @Module({
   imports: [
-    // 配置模块应该最先加载
-    ConfigModule.forRoot({
-      load: [configuration],
-      isGlobal: true,
-      cache: true,
-      ignoreEnvFile: true, // 忽略 .env 文件
-      ignoreEnvVars: true, // 忽略环境变量
-    }),
-    // 请求上下文模块
+    // CLS模块配置
     ClsModule.forRoot({
       global: true,
       middleware: {
+        // 自动为所有路由挂载CLS中间件
         mount: true,
+        // 启用请求ID生成
         generateId: true,
-        idGenerator: () => crypto.randomUUID(),
+        // 自定义ID生成器
+        idGenerator: (req) => LoggerUtils.generateLoggerIdForHttpContext(req),
+        // 请求开始时记录时间戳
+        setup: (cls: ClsService, _req, _res) => {
+          cls.set('startTime', new Date().getTime());
+        },
+        // 优化性能:不保存请求和响应对象
+        saveReq: false,
+        saveRes: false,
       },
     }),
+    ZodConfigModule,
+    PinoLoggerModule,
     // 数据库模块
     DrizzleModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      inject: [AppConfig],
+      useFactory: (appConfig: AppConfig) => ({
         postgres: {
-          url: `postgres://${configService.get('database.user')}:${configService.get('database.password')}@${configService.get('database.host')}:${configService.get('database.port')}/${configService.get('database.name')}`,
+          url: `postgres://${appConfig.database.user}:${appConfig.database.password}@${appConfig.database.host}:${appConfig.database.port}/${appConfig.database.name}`,
           config: {
-            max: configService.get('database.pool.max') || 20,
-            min: configService.get('database.pool.min') || 2,
+            max: appConfig.database.pool.max || 20,
+            min: appConfig.database.pool.min || 2,
             idleTimeoutMillis: 30000,
           },
         },
         schema: EntitiesSchema,
       }),
     }),
-    // 自定义日志模块
-    CustomLoggingModule.forRoot(LoggerUtils.httpLoggingOptions()),
     // 任务模块
     JobsModule,
   ],
-  providers: [TenantContextService],
+  providers: [
+    AppConfig, // 注册 AppConfig 为提供者
+    // LoggerConfig,
+    {
+      provide: PINO_LOGGER_OPTIONS_PROVIDER,
+      useValue: loggerOptions,
+    },
+    PinoLoggerService,
+    DrizzleLoggerService,
+    TenantContextService,
+  ],
+  exports: [PinoLoggerService, DrizzleLoggerService],
 })
 export class ApiModule implements NestModule {
+  constructor(
+    private readonly appConfig: AppConfig,
+    private readonly logger: PinoLoggerService,
+  ) {}
+
+  onModuleInit() {
+    LoggerUtils.setAppConfig(this.appConfig);
+    this.logger.info('ApiModule initialized');
+  }
+
   /**
    * 中间件配置方法
    *

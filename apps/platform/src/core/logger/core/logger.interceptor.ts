@@ -40,8 +40,8 @@ import { LoggerUtils } from '../utils/logger.utils';
  * - 使用响应式编程处理异步流程
  */
 @Injectable()
-export class CustomLoggingInterceptor implements NestInterceptor {
-  private readonly logger = new NestJSLogger(CustomLoggingInterceptor.name);
+export class LoggerInterceptor implements NestInterceptor {
+  private readonly logger = new NestJSLogger(LoggerInterceptor.name);
 
   constructor(private readonly cls: ClsService) {}
   // 拦截器的实现

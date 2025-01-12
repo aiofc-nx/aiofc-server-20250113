@@ -6,7 +6,7 @@ import { sql } from 'drizzle-orm';
 import { TenantConnectionPool } from './tenant-connection-pool';
 
 /**
- * DrizzleService 负责管理数据库连接和 Drizzle ORM 实例
+ * DrizzleService 负责管理数据库连接和 Drizzle ORM 实例以及多租户数据库连接池管理
  * 使用 @Injectable() 装饰器使其可以被 NestJS 依赖注入系统管理
  */
 @Injectable()

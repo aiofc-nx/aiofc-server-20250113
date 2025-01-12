@@ -16,6 +16,8 @@ export interface EnvironmentVariables {
   // API 配置
   API_PORT: number;
   API_GLOBAL_PREFIX: string;
+  // 追踪ID请求头配置，可选字符串类型
+  TRACKING_ID_HEADER: string;
 }
 
 /**

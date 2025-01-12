@@ -12,3 +12,6 @@ database:
 api:
   port: 3000
   globalPrefix: api
+
+logger:
+  trackingIdHeader: x-tracking-id

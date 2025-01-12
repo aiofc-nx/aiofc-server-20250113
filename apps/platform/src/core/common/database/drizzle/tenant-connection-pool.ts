@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DrizzleModuleConfig } from './drizzle.interface';
-
+import { PinoLoggerService } from '../../../logger/core';
 /**
  * 租户连接池类
  *
@@ -12,6 +12,8 @@ import { DrizzleModuleConfig } from './drizzle.interface';
  * 4. 通过search_path参数实现多租户数据隔离
  */
 export class TenantConnectionPool {
+  private static logger = PinoLoggerService.getDefaultLogger();
+
   /**
    * 存储所有租户连接池的静态Map
    * key: 租户ID
@@ -48,7 +50,7 @@ export class TenantConnectionPool {
       const db = drizzle(client);
 
       this.pools.set(poolKey, { db, client });
-      console.log(`Created new connection pool for tenant: ${tenantId}`);
+      this.logger.info({ tenantId }, 'Created new connection pool for tenant');
     }
 
     return this.pools.get(poolKey).db;
@@ -65,7 +67,8 @@ export class TenantConnectionPool {
   static async closeAll() {
     for (const [tenant, { client }] of this.pools.entries()) {
       await client.end();
-      console.log(`Closed connection pool for tenant: ${tenant}`);
+
+      this.logger.info({ tenant }, 'Closed connection pool for tenant');
     }
     this.pools.clear();
   }

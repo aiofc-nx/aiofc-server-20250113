@@ -1,25 +1,25 @@
 import { DynamicModule, Module, Global, Scope } from '@nestjs/common';
 import { DrizzleService } from './drizzle.service';
 import { DrizzleModuleConfig } from './drizzle.interface';
-import { PG_CONNECTION } from './drizzle.constants';
+import { TENANT_PG_CONNECTION } from './drizzle.constants';
 import { TenantContextService } from '../../tenant/tenant-context.service';
 import { TenantModule } from '../../tenant/tenant.module';
 
 @Global()
 @Module({})
 export class DrizzleModule {
-  static forRoot(config: DrizzleModuleConfig): DynamicModule {
+  static forRoot(drizzleConfig: DrizzleModuleConfig): DynamicModule {
     return {
       module: DrizzleModule,
       imports: [TenantModule],
       providers: [
         {
           provide: 'DRIZZLE_OPTIONS',
-          useValue: config,
+          useValue: drizzleConfig,
         },
         DrizzleService,
         {
-          provide: PG_CONNECTION,
+          provide: TENANT_PG_CONNECTION,
           scope: Scope.REQUEST,
           useFactory: async (
             drizzleService: DrizzleService,
@@ -31,12 +31,12 @@ export class DrizzleModule {
             }
             const schemaName = `tenant_${tenantId}`;
             await drizzleService.validateSchema(schemaName);
-            return drizzleService.getDrizzle(config, tenantId);
+            return drizzleService.getDrizzle(drizzleConfig, tenantId);
           },
           inject: [DrizzleService, TenantContextService],
         },
       ],
-      exports: [DrizzleService, PG_CONNECTION],
+      exports: [DrizzleService, TENANT_PG_CONNECTION],
       global: true,
     };
   }
@@ -59,11 +59,11 @@ export class DrizzleModule {
         },
         DrizzleService,
         {
-          provide: PG_CONNECTION,
+          provide: TENANT_PG_CONNECTION,
           scope: Scope.REQUEST,
           useFactory: async (
             drizzleService: DrizzleService,
-            config: DrizzleModuleConfig,
+            drizzleConfig: DrizzleModuleConfig,
             tenantContext: TenantContextService,
           ) => {
             const tenantId = tenantContext.getTenantId();
@@ -72,12 +72,12 @@ export class DrizzleModule {
             }
             const schemaName = `tenant_${tenantId}`;
             await drizzleService.validateSchema(schemaName);
-            return drizzleService.getDrizzle(config, tenantId);
+            return drizzleService.getDrizzle(drizzleConfig, tenantId);
           },
           inject: [DrizzleService, 'DRIZZLE_OPTIONS', TenantContextService],
         },
       ],
-      exports: [DrizzleService, PG_CONNECTION],
+      exports: [DrizzleService, TENANT_PG_CONNECTION],
       global: true,
     };
   }
