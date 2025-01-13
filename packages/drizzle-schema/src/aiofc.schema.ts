@@ -1,10 +1,10 @@
 import { index, pgSchema, varchar } from 'drizzle-orm/pg-core';
-import { commonWithTenantId } from '../utils/entity.helpers';
+import { commonWithTenantId } from './utils/entity.helpers';
 // see:https://orm.drizzle.team/docs/sql-schema-declaration#advanced
-// name:'aiofc'会作为数据库的schema的名字
-export const aiofcSchema = pgSchema('aiofc');
+// name:'default'会作为数据库的schema的名字
+export const defaultSchema = pgSchema('default');
 
-export const jobs = aiofcSchema.table(
+export const jobs = defaultSchema.table(
   'jobs',
   {
     ...commonWithTenantId,

@@ -33,6 +33,7 @@ const EnvSchema = z.object({
   DB_USER: z.string(),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
+  DB_SCHEMA: z.string().default('tenant_default'),
   DB_PORT: z.coerce.number(),
   DATABASE_URL: z.string(),
   DB_MIGRATING: stringBoolean,

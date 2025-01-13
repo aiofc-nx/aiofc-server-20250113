@@ -1,4 +1,5 @@
-import { index, pgTable, varchar } from 'drizzle-orm/pg-core';
+import { index, pgTable, varchar, check } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { WithIdPk } from '../helpers/with-id-pk';
 import { WithModificationDates } from '../helpers/with-modification-dates';
 
@@ -27,9 +28,13 @@ export const jobs = pgTable(
   {
     ...WithIdPk,
     name: varchar('name', { length: 256 }),
+    tenantId: varchar('tenant_id', { length: 50 }).notNull(),
     ...WithModificationDates,
   },
-  (jobs) => [index('name_idx').on(jobs.name)],
+  (jobs) => [
+    index('name_idx').on(jobs.name),
+    check('tenant_id_not_empty', sql`tenant_id != ''`),
+  ],
 );
 
 /**
@@ -39,4 +44,7 @@ export const jobs = pgTable(
  * JobEntityInsert: 用于插入数据时的类型(可选字段)
  */
 export type JobEntity = typeof jobs.$inferSelect;
-export type JobEntityInsert = typeof jobs.$inferInsert;
+export type JobEntityInsert = {
+  name: string;
+  tenantId: string;
+};

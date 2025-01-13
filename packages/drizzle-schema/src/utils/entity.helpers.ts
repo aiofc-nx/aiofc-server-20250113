@@ -24,7 +24,7 @@ export const tracked = {
 // };
 
 export const tenantId = {
-  tenantId: varchar('tenant_id'),
+  tenantId: varchar('tenant_id', { length: 50 }).notNull(),
 };
 
 export const common = {

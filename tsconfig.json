@@ -6,6 +6,7 @@
     { "path": "./packages/utils" },
     { "path": "./apps/platform" },
     { "path": "./packages/nestjs-drizzle" },
-    { "path": "./packages/drizzle-schema" }
+    { "path": "./packages/drizzle-schema" },
+    { "path": "./apps/saas" }
   ]
 }

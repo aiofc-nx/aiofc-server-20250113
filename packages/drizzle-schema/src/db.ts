@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import * as schema from './schemas/aiofc.schema';
+import * as schema from './schemas';
 import env from './config/env';
 
 /**
@@ -14,8 +14,12 @@ import env from './config/env';
 export const connection = postgres(env.DATABASE_URL, {
   max: env.DB_MIGRATING || env.DB_SEEDING ? 1 : undefined,
   onnotice: env.DB_SEEDING ? () => {} : undefined,
+  connection: {
+    search_path: env.DB_SCHEMA, // 指定数据表所在的schema
+  },
 });
 
+/**
 /**
  * Drizzle ORM 实例化
  *
@@ -25,7 +29,7 @@ export const connection = postgres(env.DATABASE_URL, {
  * - 启用日志记录功能,方便调试
  */
 export const db = drizzle(connection, {
-  schema,
+  schema: schema,
   logger: true,
 });
 
