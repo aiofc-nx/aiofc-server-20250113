@@ -1,11 +1,12 @@
 {
+  "$schema": "https://typedoc.org/schema.json",
   "tsconfig": "./tsconfig.base.json",
   "entryPointStrategy": "expand",
   "entryPoints": [
     "./apps/*/src/**/!(*.spec|*.test).ts",
-    "./packages/*/src/**/!(*.spec|*.test).ts",
-    "./tutorial/**/*.md"
+    "./packages/*/src/**/!(*.spec|*.test).ts"
   ],
+  "projectDocuments": ["tutorial/**/*.md"],
   "out": "./docs/api",
   "name": "AIOFC API 文档",
   "theme": "default",
@@ -16,7 +17,14 @@
   "plugin": ["typedoc-plugin-merge-modules"],
   "skipErrorChecking": true,
   "categorizeByGroup": true,
-  "categoryOrder": ["Tutorial", "Apps", "Packages", "*"],
+  "categoryOrder": [
+    "Classes",
+    "Interfaces",
+    "Enums",
+    "Functions",
+    "Variables",
+    "*"
+  ],
   "exclude": [
     "**/dist/**",
     "**/node_modules/**",
@@ -39,5 +47,7 @@
     "@description"
   ],
   "intentionallyNotExported": ["EnvSchema", "EnvVariables"],
-  "readme": "tutorial/README.md"
+  "readme": "tutorial/README.md",
+  "logLevel": "Verbose",
+  "lang": "zh"
 }

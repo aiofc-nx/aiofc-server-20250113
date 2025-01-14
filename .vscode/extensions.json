@@ -14,6 +14,7 @@
     "prisma.prisma",
     "qwtel.sqlite-viewer",
     "yoavbls.pretty-ts-errors",
-    "corschenzi.mermaid-graphical-editor"
+    "corschenzi.mermaid-graphical-editor",
+    "psulek-solo.typedoc-live-preview"
   ]
 }
