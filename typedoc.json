@@ -3,7 +3,8 @@
   "entryPointStrategy": "expand",
   "entryPoints": [
     "./apps/*/src/**/!(*.spec|*.test).ts",
-    "./packages/*/src/**/!(*.spec|*.test).ts"
+    "./packages/*/src/**/!(*.spec|*.test).ts",
+    "./tutorial/**/*.md"
   ],
   "out": "./docs/api",
   "name": "AIOFC API 文档",
@@ -15,7 +16,7 @@
   "plugin": ["typedoc-plugin-merge-modules"],
   "skipErrorChecking": true,
   "categorizeByGroup": true,
-  "categoryOrder": ["Apps", "Packages", "*"],
+  "categoryOrder": ["Tutorial", "Apps", "Packages", "*"],
   "exclude": [
     "**/dist/**",
     "**/node_modules/**",
@@ -29,6 +30,14 @@
     "invalidLink": false,
     "notDocumented": false
   },
-  "blockTags": ["@todo", "@description"],
-  "intentionallyNotExported": ["EnvSchema", "EnvVariables"]
+  "blockTags": [
+    "@param",
+    "@returns",
+    "@throws",
+    "@example",
+    "@todo",
+    "@description"
+  ],
+  "intentionallyNotExported": ["EnvSchema", "EnvVariables"],
+  "readme": "tutorial/README.md"
 }

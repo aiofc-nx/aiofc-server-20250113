@@ -381,6 +381,9 @@ importers:
       typedoc:
         specifier: ^0.27.6
         version: 0.27.6(typescript@5.7.2)
+      typedoc-plugin-markdown:
+        specifier: ^4.4.1
+        version: 4.4.1(typedoc@0.27.6)
       typedoc-plugin-merge-modules:
         specifier: ^6.1.0
         version: 6.1.0(typedoc@0.27.6)
@@ -14929,6 +14932,15 @@ packages:
 
   /typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
+
+  /typedoc-plugin-markdown@4.4.1(typedoc@0.27.6):
+    resolution: {integrity: sha512-fx23nSCvewI9IR8lzIYtzDphETcgTDuxKcmHKGD4lo36oexC+B1k4NaCOY58Snqb4OlE8OXDAGVcQXYYuLRCNw==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      typedoc: 0.27.x
+    dependencies:
+      typedoc: 0.27.6(typescript@5.7.2)
+    dev: true
 
   /typedoc-plugin-merge-modules@6.1.0(typedoc@0.27.6):
     resolution: {integrity: sha512-AZIyw+H1oG3xpJOq1b2CVnpK7A6OIddi7FsjljsbmQ7vx6dtaorEoz/DQPcGSOzWhWdJPqqdncIzVySuoffS2w==}
