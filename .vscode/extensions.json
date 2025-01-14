@@ -13,6 +13,7 @@
     "esbenp.prettier-vscode",
     "prisma.prisma",
     "qwtel.sqlite-viewer",
-    "yoavbls.pretty-ts-errors"
+    "yoavbls.pretty-ts-errors",
+    "corschenzi.mermaid-graphical-editor"
   ]
 }

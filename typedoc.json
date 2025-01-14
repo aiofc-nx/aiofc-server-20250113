@@ -1,0 +1,34 @@
+{
+  "tsconfig": "./tsconfig.base.json",
+  "entryPointStrategy": "expand",
+  "entryPoints": [
+    "./apps/*/src/**/!(*.spec|*.test).ts",
+    "./packages/*/src/**/!(*.spec|*.test).ts"
+  ],
+  "out": "./docs/api",
+  "name": "AIOFC API 文档",
+  "theme": "default",
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeExternals": false,
+  "includeVersion": true,
+  "plugin": ["typedoc-plugin-merge-modules"],
+  "skipErrorChecking": true,
+  "categorizeByGroup": true,
+  "categoryOrder": ["Apps", "Packages", "*"],
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/jest.config.ts",
+    "**/jest.preset.js",
+    "**/__tests__/**"
+  ],
+  "validation": {
+    "invalidLink": false,
+    "notDocumented": false
+  },
+  "blockTags": ["@todo", "@description"],
+  "intentionallyNotExported": ["EnvSchema", "EnvVariables"]
+}
