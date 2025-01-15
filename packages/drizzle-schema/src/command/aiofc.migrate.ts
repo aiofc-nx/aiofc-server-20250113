@@ -21,7 +21,11 @@ async function main() {
     throw new Error('运行迁移时必须将 DB_MIGRATING 设置为“true”');
   }
 
-  await migrate(db, { migrationsFolder: env.MIGRATIONS_FOLDER });
+  await migrate(db, {
+    migrationsFolder: env.MIGRATIONS_FOLDER, // 指定迁移文件所在的目录
+    migrationsSchema: env.DB_SCHEMA, // 指定迁移表所在的schema
+    // migrationsTable: '_drizzle_migrations', // 指定迁移表的名称
+  });
   await connection.end();
 }
 

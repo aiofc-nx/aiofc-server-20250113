@@ -94,16 +94,14 @@ export class AbstractDao<
   /**
    * 插入新记录
    */
-  async insertNewRecord(
-    entity: Partial<InferEntityInsert>,
-  ): Promise<Partial<InferEntitySelected>> {
+  async insertNewRecord(entity: InferEntityInsert): Promise<InferEntityInsert> {
     const insertedRows = await this.db
       .insert(this.entity)
       .values(entity as InferInsertModel<Entity>)
       .returning()
       .execute();
     return Array.isArray(insertedRows) && insertedRows.length === 1
-      ? (insertedRows.at(-1) as Partial<InferEntitySelected>)
+      ? (insertedRows.at(-1) as InferEntityInsert)
       : null;
   }
 
@@ -124,13 +122,13 @@ export class AbstractDao<
   async updateById(
     id: string,
     fieldsToUpdate: Partial<InferEntityInsert>,
-  ): Promise<Partial<InferEntitySelected>[]> {
+  ): Promise<InferEntityInsert[]> {
     return (await this.db
       .update(this.entity)
-      .set(fieldsToUpdate as InferEntityInsert)
+      .set(fieldsToUpdate)
       .where(eq(this.entity['id'], id))
       .returning()
-      .execute()) as Partial<InferEntitySelected>[];
+      .execute()) as InferEntityInsert[];
   }
 
   /**

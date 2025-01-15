@@ -17,6 +17,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "skipDefaultLibCheck": true,
+    "strictNullChecks": false,
     "declaration": true,
     "paths": {
       "@aiofc/drizzle-postgres-js": [

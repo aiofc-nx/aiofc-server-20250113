@@ -41,10 +41,11 @@ export class JobsService {
    * - 接收工作名称作为参数
    * - 返回插入的记录信息
    */
-  async addJob(jobName: string): Promise<JobEntityInsert> {
+  async addJob(jobName: string, tenantId: string): Promise<JobEntityInsert> {
     return await this.jobDao.insertNewRecord({
       name: jobName,
-    });
+      tenantId,
+    } as JobEntityInsert);
   }
 
   /**

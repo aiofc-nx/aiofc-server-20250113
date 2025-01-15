@@ -49,7 +49,7 @@ export class JobsController {
     @Body() jobData: unknown,
   ): Promise<z.infer<typeof JobResponseDto.schema>> {
     const validatedData = JobResponseDto.validate(jobData);
-    return this.jobsService.addJob(validatedData.name);
+    return this.jobsService.addJob(validatedData.name, validatedData.tenantId);
   }
 
   /**

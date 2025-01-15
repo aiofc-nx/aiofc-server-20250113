@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { DrizzleModuleConfig } from './drizzle.interface';
 import { sql } from 'drizzle-orm';
 import { TenantConnectionPool } from './tenant-connection-pool';
+import { ClsService } from 'nestjs-cls';
 
 /**
  * DrizzleService 负责管理数据库连接和 Drizzle ORM 实例以及多租户数据库连接池管理
@@ -21,6 +22,7 @@ export class DrizzleService implements OnApplicationShutdown {
     // 根据令牌配置config
     @Inject('DRIZZLE_OPTIONS')
     private readonly config: DrizzleModuleConfig,
+    private readonly cls: ClsService,
   ) {}
 
   /**
@@ -49,7 +51,23 @@ export class DrizzleService implements OnApplicationShutdown {
     if (!options?.postgres?.url) {
       throw new Error('Database connection URL is required');
     }
-    return TenantConnectionPool.getPool(tenantId, options);
+
+    const db = await TenantConnectionPool.getPool(tenantId, options);
+
+    // 使用代理拦截查询
+    return new Proxy(db, {
+      get: (target, prop) => {
+        const original = target[prop];
+        if (typeof original === 'function') {
+          return (...args: any[]) => {
+            // 在这里添加租户过滤逻辑
+            const result = original.apply(target, args);
+            return result;
+          };
+        }
+        return original;
+      },
+    });
   }
 
   async validateSchema(schemaName: string): Promise<void> {

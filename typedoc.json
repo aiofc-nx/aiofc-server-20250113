@@ -1,0 +1,53 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "tsconfig": "./tsconfig.base.json",
+  "entryPointStrategy": "expand",
+  "entryPoints": [
+    "./apps/*/src/**/!(*.spec|*.test).ts",
+    "./packages/*/src/**/!(*.spec|*.test).ts"
+  ],
+  "projectDocuments": ["tutorial/**/*.md"],
+  "out": "./docs/api",
+  "name": "AIOFC API 文档",
+  "theme": "default",
+  "excludePrivate": false,
+  "excludeProtected": false,
+  "excludeExternals": false,
+  "includeVersion": true,
+  "plugin": ["typedoc-plugin-merge-modules"],
+  "skipErrorChecking": true,
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Classes",
+    "Interfaces",
+    "Enums",
+    "Functions",
+    "Variables",
+    "*"
+  ],
+  "exclude": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/jest.config.ts",
+    "**/jest.preset.js",
+    "**/__tests__/**"
+  ],
+  "validation": {
+    "invalidLink": false,
+    "notDocumented": false
+  },
+  "blockTags": [
+    "@param",
+    "@returns",
+    "@throws",
+    "@example",
+    "@todo",
+    "@description"
+  ],
+  "intentionallyNotExported": ["EnvSchema", "EnvVariables"],
+  "readme": "tutorial/README.md",
+  "logLevel": "Verbose",
+  "lang": "zh"
+}
