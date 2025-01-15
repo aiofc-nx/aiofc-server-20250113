@@ -1,15 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
-  "files": [],
-  "include": [],
-  "references": [{ "path": "./tsconfig.app.json" }],
+  "include": ["**/*.ts", "**/*.js", "../../eslint.base.config.js"],
+  "references": [
+    { "path": "../../packages/zod-env" },
+    { "path": "../../packages/pino-logger" },
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.spec.json" }
+  ],
   "compilerOptions": {
-    "esModuleInterop": true,
     "composite": true,
     "declaration": true,
-    "paths": {
-      "@api/*": ["src/api/*"],
-      "@core/*": ["src/core/*"]
-    }
+    "esModuleInterop": true
   }
 }

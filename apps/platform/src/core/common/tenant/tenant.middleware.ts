@@ -60,7 +60,7 @@ export class TenantMiddleware implements NestMiddleware {
   }
 
   // 中间件执行逻辑
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: Request, _res: Response, next: NextFunction) {
     this.logger.log('TenantMiddleware executing...');
     this.logger.log(`Path: ${req.path}, OriginalUrl: ${req.originalUrl}`);
     this.logger.log(`Headers: ${this.formatHeaders(req.headers)}`);

@@ -1,5 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule, OnModuleInit } from '@nestjs/common';
-import { LoggerUtils } from '../core/logger/utils/logger.utils';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  OnModuleInit,
+} from '@nestjs/common';
+import { LoggerUtils } from '@aiofc/pino-logger';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { TenantMiddleware } from '../core/common/tenant/tenant.middleware';
 import { TenantContextService } from '../core/common/tenant/tenant-context.service';
@@ -10,11 +15,11 @@ import {
   DrizzleLoggerService,
   PINO_LOGGER_OPTIONS_PROVIDER,
   PinoLoggerService,
-} from '../core/logger/core';
+} from '@aiofc/pino-logger';
 import { PrettyOptions } from 'pino-pretty';
 import { AppConfig } from '../config/app-config.service';
 import { ZodConfigModule } from '../config/zod-config.module';
-import { PinoLoggerModule } from '../core/logger/core/pino-logger.module';
+import { PinoLoggerModule } from '@aiofc/pino-logger';
 
 const loggerOptions: PrettyOptions = {
   colorize: true,
@@ -82,7 +87,7 @@ export class ApiModule implements NestModule, OnModuleInit {
   ) {}
 
   onModuleInit() {
-    LoggerUtils.setAppConfig(this.appConfig);
+    LoggerUtils.setConfig(this.appConfig);
     this.logger.info('ApiModule initialized');
   }
 

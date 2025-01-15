@@ -9,7 +9,7 @@ database:
     max: 20
     min: 2
 
-api:
+server:
   port: 3000
   globalPrefix: api
 

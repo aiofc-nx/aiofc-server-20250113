@@ -1,0 +1,26 @@
+{
+  "name": "zod-demo",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "examples/zod-demo/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "zod-demo:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "zod-demo:build:development"
+        },
+        "production": {
+          "buildTarget": "zod-demo:build:production"
+        }
+      }
+    }
+  }
+}

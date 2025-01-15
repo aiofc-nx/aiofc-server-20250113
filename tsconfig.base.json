@@ -24,7 +24,9 @@
         "packages/drizzle-postgres-js/src/index.ts"
       ],
       "@aiofc/drizzle-schema": ["packages/drizzle-schema/src/index.ts"],
-      "@aiofc/utils": ["packages/utils/src/index.ts"]
+      "@aiofc/pino-logger": ["packages/pino-logger/src/index.ts"],
+      "@aiofc/utils": ["packages/utils/src/index.ts"],
+      "@aiofc/zod-env": ["packages/zod-env/src/index.ts"]
     }
   }
 }

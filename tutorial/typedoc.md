@@ -1,5 +1,11 @@
 # TypeDoc 使用指南
 
+[示例1](https://github.com/TypeStrong/typedoc)
+
+[示例2](https://github.com/Gerrit0/typedoc-packages-example)
+
+[示例3](https://github.com/mipatterson/typedoc-plugin-pages)
+
 TypeDoc 是一个用于 **TypeScript 项目**的文档生成工具。它能够将 TypeScript 代码中的注释转换为美观的文档网站，类似于 JSDoc 的功能，但专为 TypeScript 设计。TypeDoc 支持 TypeScript 的类型系统，并且能够生成详细的 API 文档。
 
 我们可以从以下几个方面来讨论 TypeDoc：

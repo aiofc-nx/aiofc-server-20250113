@@ -88,6 +88,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@aiofc/pino-logger": "workspace:*",
+    "@aiofc/zod-env": "workspace:*",
     "@aiofc/drizzle-schema": "workspace:*",
     "@aiofc/utils": "workspace:*",
     "@faker-js/faker": "^9.3.0",

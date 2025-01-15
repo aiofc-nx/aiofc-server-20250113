@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { DrizzleModuleConfig } from './drizzle.interface';
-import { PinoLoggerService } from '../../../logger/core';
+import { PinoLoggerService } from '@aiofc/pino-logger';
 /**
  * 租户连接池类
  *

@@ -3,9 +3,11 @@
   "compileOnSave": false,
   "references": [
     { "path": "./packages/utils" },
-    { "path": "./apps/platform" },
     { "path": "./packages/nestjs-drizzle" },
-    { "path": "./packages/drizzle-schema" }
+    { "path": "./packages/drizzle-schema" },
+    { "path": "./packages/zod-env" },
+    { "path": "./apps/platform" },
+    { "path": "./packages/pino-logger" }
   ],
 
   "include": ["apps/*/src/**/*.ts", "packages/*/src/**/*.ts"],

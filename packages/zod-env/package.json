@@ -1,0 +1,12 @@
+{
+  "name": "@aiofc/zod-env",
+  "version": "0.0.1",
+  "dependencies": {
+    "tslib": "^2.3.0",
+    "zod": "^3.24.1",
+    "js-yaml": "^4.1.0"
+  },
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts"
+}

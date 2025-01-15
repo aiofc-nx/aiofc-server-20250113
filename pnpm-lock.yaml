@@ -11,9 +11,15 @@ importers:
       '@aiofc/drizzle-schema':
         specifier: workspace:*
         version: link:packages/drizzle-schema
+      '@aiofc/pino-logger':
+        specifier: workspace:*
+        version: link:packages/pino-logger
       '@aiofc/utils':
         specifier: workspace:*
         version: link:packages/utils
+      '@aiofc/zod-env':
+        specifier: workspace:*
+        version: link:packages/zod-env
       '@faker-js/faker':
         specifier: ^9.3.0
         version: 9.3.0
@@ -439,6 +445,33 @@ importers:
         specifier: ^2.3.0
         version: 2.8.1
 
+  packages/pino-logger:
+    dependencies:
+      '@nestjs/common':
+        specifier: ^10.4.8
+        version: 10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      drizzle-orm:
+        specifier: ^0.38.3
+        version: 0.38.3(@prisma/client@6.2.0)(@types/pg@8.11.10)(postgres@3.4.5)(react@19.0.0)
+      fastify:
+        specifier: 4.28.1
+        version: 4.28.1
+      nestjs-cls:
+        specifier: ^4.5.0
+        version: 4.5.0(@nestjs/common@10.4.15)(@nestjs/core@10.4.15)(reflect-metadata@0.1.14)(rxjs@7.8.1)
+      pino:
+        specifier: ^9.5.0
+        version: 9.6.0
+      pino-pretty:
+        specifier: ^13.0.0
+        version: 13.0.0
+      rxjs:
+        specifier: ^7.8.0
+        version: 7.8.1
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+
   packages/utils:
     dependencies:
       argon2:
@@ -450,6 +483,18 @@ importers:
       tslib:
         specifier: ^2.3.0
         version: 2.8.1
+
+  packages/zod-env:
+    dependencies:
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.0
+      tslib:
+        specifier: ^2.3.0
+        version: 2.8.1
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
 
 packages:
 

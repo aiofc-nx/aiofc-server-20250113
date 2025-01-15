@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { ApiModule } from './api.module';
-import { LoggerUtils } from '../core/logger/utils/logger.utils';
-import { PinoLoggerService } from '../core/logger/core/pino-logger.service';
-import { LoggerInterceptor } from '../core/logger/core/logger.interceptor';
+import { LoggerUtils } from '@aiofc/pino-logger';
+import { PinoLoggerService } from '@aiofc/pino-logger';
+import { LoggerInterceptor } from '@aiofc/pino-logger';
 import { ClsService } from 'nestjs-cls';
 import { AppConfig } from '../config/app-config.service';
 
@@ -42,9 +42,9 @@ async function bootstrap() {
   app.enableCors();
   // 设置全局路由前缀
   const appConfig = app.get<AppConfig>(AppConfig);
-  app.setGlobalPrefix(appConfig.api.globalPrefix);
+  app.setGlobalPrefix(appConfig.server.globalPrefix);
   // 启动 HTTP 服务器
-  await app.listen(appConfig.api.port);
+  await app.listen(appConfig.server.port);
 }
 
 void bootstrap();
