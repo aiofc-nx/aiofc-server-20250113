@@ -80,6 +80,7 @@
     "ts-node": "10.9.2",
     "tsx": "^4.19.2",
     "typedoc": "^0.27.6",
+    "typedoc-default-themes": "^0.12.10",
     "typedoc-plugin-markdown": "^4.4.1",
     "typedoc-plugin-merge-modules": "^6.1.0",
     "typescript": "^5.7.2",
@@ -88,10 +89,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@aiofc/pino-logger": "workspace:*",
-    "@aiofc/zod-env": "workspace:*",
     "@aiofc/drizzle-schema": "workspace:*",
+    "@aiofc/pino-logger": "workspace:*",
     "@aiofc/utils": "workspace:*",
+    "@aiofc/zod-env": "workspace:*",
     "@faker-js/faker": "^9.3.0",
     "@fastify/helmet": "^11.0.0",
     "@fastify/static": "^7.0.4",

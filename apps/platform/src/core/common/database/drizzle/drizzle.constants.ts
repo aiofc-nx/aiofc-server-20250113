@@ -1,6 +1,7 @@
 /**
  * PostgreSQL数据库连接注入令牌
  *
+ * @remarks
  * 机制说明:
  * 1. 定义一个常量作为依赖注入的标识符
  * 2. 用于在NestJS依赖注入系统中标识PostgreSQL数据库连接

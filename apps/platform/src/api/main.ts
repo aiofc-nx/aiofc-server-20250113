@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { ApiModule } from './api.module';
-import { LoggerUtils } from '@aiofc/pino-logger';
+import { Logger } from '@aiofc/pino-logger';
 import { PinoLoggerService } from '@aiofc/pino-logger';
 import { LoggerInterceptor } from '@aiofc/pino-logger';
 import { ClsService } from 'nestjs-cls';
@@ -31,7 +31,7 @@ import { AppConfig } from '../config/app-config.service';
  */
 async function bootstrap() {
   // 创建 Fastify 适配器，使用默认的 Fastify 日志
-  const adapter = new FastifyAdapter(LoggerUtils.defaultFastifyAdapterLogger);
+  const adapter = new FastifyAdapter(Logger.defaultFastifyAdapterLogger);
   // 创建 NestJS 应用，使用 Fastify 适配器
   const app = await NestFactory.create(ApiModule, adapter);
   // 使用自定义日志服务

@@ -7,9 +7,33 @@ import { TenantConnectionPool } from './tenant-connection-pool';
 import { ClsService } from 'nestjs-cls';
 
 /**
- * DrizzleService 负责管理数据库连接和 Drizzle ORM 实例以及多租户数据库连接池管理
- * 使用 @Injectable() 装饰器使其可以被 NestJS 依赖注入系统管理
+ * DrizzleService 类
+ *
+ * 功能:
+ * - 管理数据库连接和多租户隔离
+ * - 处理 schema 验证
+ * - 提供数据库操作接口
+ *
+ * @example
+ * ```typescript
+ * // 初始化服务
+ * const drizzleService = new DrizzleService(config, clsService);
+ *
+ * // 获取特定租户的数据库实例
+ * const db = await drizzleService.getDrizzle({
+ *   postgres: {
+ *     url: 'postgresql://user:pass@localhost:5432/db'
+ *   }
+ * }, 'tenant-123');
+ *
+ * // 执行查询
+ * const results = await db.select().from(users);
+ * ```
+ *
+ * @remarks
+ * 该服务实现了 OnApplicationShutdown 接口，确保应用关闭时正确清理数据库连接
  */
+
 @Injectable()
 export class DrizzleService implements OnApplicationShutdown {
   /**
@@ -42,6 +66,7 @@ export class DrizzleService implements OnApplicationShutdown {
    * - 利用 PostgreSQL 的 schema 实现多租户隔离
    * - 通过连接池复用减少资源开销
    * - 基于租户ID动态路由到对应的数据库连接
+   * @document ../../../../../../docs/tutor/drizzle/proxy.md
    *
    * @param options - Drizzle模块配置对象
    * @param tenantId - 租户标识
@@ -54,7 +79,12 @@ export class DrizzleService implements OnApplicationShutdown {
 
     const db = await TenantConnectionPool.getPool(tenantId, options);
 
-    // 使用代理拦截查询
+    /**
+     * 使用代理拦截查询
+     * @param target - 目标对象
+     * @param prop - 属性名
+     * @returns 返回代理对象
+     */
     return new Proxy(db, {
       get: (target, prop) => {
         const original = target[prop];

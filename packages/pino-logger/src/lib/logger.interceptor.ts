@@ -9,7 +9,7 @@ import { FastifyReply } from 'fastify/types/reply';
 import { Observable, tap } from 'rxjs';
 import { Logger as NestJSLogger } from '@nestjs/common/services/logger.service';
 import { ClsService } from 'nestjs-cls';
-import { LoggerUtils } from './logger.utils';
+import { Logger } from './logger';
 /**
  * 这是一个 HTTP 上下文拦截器，用于记录请求/响应的 HTTP 方法/状态代码/等
  * 这并不理想，因为可以在 Nestjs 拦截器（例如中间件或过滤器）之前/之后修改请求/响应。
@@ -52,7 +52,7 @@ export class LoggerInterceptor implements NestInterceptor {
       context.switchToHttp().getResponse(),
     ];
     // 记录请求接收日志
-    this.logger.log(LoggerUtils.customReceivedMessage(request));
+    this.logger.log(Logger.customReceivedMessage(request));
     // 记录请求开始时间
     this.cls.set('startTime', new Date().getTime());
     // 计算请求处理耗时
@@ -63,12 +63,12 @@ export class LoggerInterceptor implements NestInterceptor {
       tap({
         next: (): void => {
           this.logger.log(
-            LoggerUtils.customResponseMessage(request, response, elapsedTime),
+            Logger.customResponseMessage(request, response, elapsedTime),
           );
         },
         error: (): void => {
           this.logger.log(
-            LoggerUtils.customResponseMessage(request, response, elapsedTime),
+            Logger.customResponseMessage(request, response, elapsedTime),
           );
         },
       }),

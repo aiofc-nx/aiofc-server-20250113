@@ -1,5 +1,6 @@
 {
   "$schema": "https://typedoc.org/schema.json",
+  "includeVersion": true,
   "tsconfig": "./tsconfig.base.json",
   "entryPointStrategy": "expand",
   "entryPoints": [
@@ -13,8 +14,7 @@
   "excludePrivate": false,
   "excludeProtected": false,
   "excludeExternals": false,
-  "includeVersion": true,
-  "plugin": ["typedoc-plugin-merge-modules"],
+  "plugin": ["typedoc-plugin-merge-modules", "typedoc-plugin-markdown"],
   "skipErrorChecking": true,
   "categorizeByGroup": true,
   "categoryOrder": [
@@ -38,16 +38,33 @@
     "invalidLink": false,
     "notDocumented": false
   },
-  "blockTags": [
-    "@param",
-    "@returns",
-    "@throws",
-    "@example",
-    "@todo",
-    "@description"
-  ],
   "intentionallyNotExported": ["EnvSchema", "EnvVariables"],
   "readme": "tutorial/README.md",
   "logLevel": "Verbose",
-  "lang": "zh"
+  "navigationLinks": {
+    "Docs": "https://typedoc.org",
+    "API": "https://typedoc.org/api/index.html",
+    "GitHub": "https://github.com/TypeStrong/typedoc"
+  },
+  "searchCategoryBoosts": {
+    "Component": 2,
+    "Model": 1.2
+  },
+  "searchGroupBoosts": {
+    "Classes": 1.5
+  },
+  "highlightLanguages": [
+    "typescript",
+    "tsx",
+    "css",
+    "json",
+    "jsonc",
+    "python",
+    "yaml",
+    "markdown"
+  ],
+  "markdownItOptions": {
+    "html": true
+  }
+  // "lang": "zh"
 }

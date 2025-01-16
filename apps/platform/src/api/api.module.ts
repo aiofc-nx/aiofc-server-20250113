@@ -4,7 +4,7 @@ import {
   NestModule,
   OnModuleInit,
 } from '@nestjs/common';
-import { LoggerUtils } from '@aiofc/pino-logger';
+import { Logger } from '@aiofc/pino-logger';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { TenantMiddleware } from '../core/common/tenant/tenant.middleware';
 import { TenantContextService } from '../core/common/tenant/tenant-context.service';
@@ -37,7 +37,7 @@ const loggerOptions: PrettyOptions = {
         // 启用请求ID生成
         generateId: true,
         // 自定义ID生成器
-        idGenerator: (req) => LoggerUtils.generateLoggerIdForHttpContext(req),
+        idGenerator: (req) => Logger.generateLoggerIdForHttpContext(req),
         // 请求开始时记录时间戳
         setup: (cls: ClsService, _req, _res) => {
           cls.set('startTime', new Date().getTime());
@@ -87,7 +87,7 @@ export class ApiModule implements NestModule, OnModuleInit {
   ) {}
 
   onModuleInit() {
-    LoggerUtils.setConfig(this.appConfig);
+    Logger.setConfig(this.appConfig);
     this.logger.info('ApiModule initialized');
   }
 
