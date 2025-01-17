@@ -7,14 +7,14 @@
     "./apps/*/src/**/!(*.spec|*.test).ts",
     "./packages/*/src/**/!(*.spec|*.test).ts"
   ],
-  "projectDocuments": ["tutorial/**/*.md"],
+  "projectDocuments": ["docs/project/**/*.md"],
   "out": "./docs/api",
   "name": "AIOFC API 文档",
   "theme": "default",
   "excludePrivate": false,
   "excludeProtected": false,
   "excludeExternals": false,
-  "plugin": ["typedoc-plugin-merge-modules", "typedoc-plugin-markdown"],
+  // "plugin": ["typedoc-plugin-merge-modules", "typedoc-plugin-markdown"],
   "skipErrorChecking": true,
   "categorizeByGroup": true,
   "categoryOrder": [
@@ -39,7 +39,7 @@
     "notDocumented": false
   },
   "intentionallyNotExported": ["EnvSchema", "EnvVariables"],
-  "readme": "tutorial/README.md",
+  "readme": "docs/project/README.md",
   "logLevel": "Verbose",
   "navigationLinks": {
     "Docs": "https://typedoc.org",

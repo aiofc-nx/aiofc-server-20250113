@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { BaseDto } from '../../../../core/common/base/base.dto';
-import { JobEntity } from '../../../../core/common/database/entities/job/job.entity';
+import { Job } from '@aiofc/drizzle-schema';
 
 const jobResponseSchema = z.object({
   name: z
@@ -12,7 +12,7 @@ const jobResponseSchema = z.object({
 
 export class JobResponseDto
   extends BaseDto
-  implements Pick<JobEntity, 'name' | 'tenantId'>
+  implements Pick<Job, 'name' | 'tenantId'>
 {
   name!: string;
   tenantId!: string;

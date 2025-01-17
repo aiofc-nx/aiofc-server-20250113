@@ -3,3 +3,4 @@ apps/drizzle-kits
 packages/nestjs-drizzle
 packages/utils
 # apps/platform
+astro

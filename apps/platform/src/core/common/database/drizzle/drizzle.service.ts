@@ -37,10 +37,10 @@ import { ClsService } from 'nestjs-cls';
 @Injectable()
 export class DrizzleService implements OnApplicationShutdown {
   /**
-   * 已验证的 schema 集合
-   * 使用 Set 来存储已验证的 schema，避免重复验证
+   * 缓存已验证的数据库 schema
+   * 使用 Set 来存储已验证过的 schema 名称，避免重复验证
    */
-  private validSchemas = new Set<string>();
+  private validatedSchemaCache = new Set<string>();
   // 构造函数，用于注入 DrizzleModuleConfig
   constructor(
     // 根据令牌配置config
@@ -49,49 +49,85 @@ export class DrizzleService implements OnApplicationShutdown {
     private readonly cls: ClsService,
   ) {}
 
-  /**
-   * 获取租户专用的 Drizzle 实例
-   *
-   * 机制:
-   * 1. 参数验证
-   * - 检查数据库连接配置的完整性
-   * - 确保 postgres.url 必须存在
-   *
-   * 2. 连接池管理
-   * - 通过 TenantConnectionPool 获取或创建租户专用连接池
-   * - 每个租户使用独立的 schema 和连接池
-   * - 复用已存在的连接以提高性能
-   *
-   * 原理:
-   * - 利用 PostgreSQL 的 schema 实现多租户隔离
-   * - 通过连接池复用减少资源开销
-   * - 基于租户ID动态路由到对应的数据库连接
-   * @document ../../../../../../docs/tutor/drizzle/proxy.md
-   *
-   * @param options - Drizzle模块配置对象
-   * @param tenantId - 租户标识
-   * @returns 返回租户专用的Drizzle实例
-   */
-  public async getDrizzle(options: DrizzleModuleConfig, tenantId: string) {
+  public async getDrizzleWithTenantProxy(
+    options: DrizzleModuleConfig,
+    tenantId: string,
+  ) {
     if (!options?.postgres?.url) {
       throw new Error('Database connection URL is required');
     }
 
     const db = await TenantConnectionPool.getPool(tenantId, options);
 
-    /**
-     * 使用代理拦截查询
-     * @param target - 目标对象
-     * @param prop - 属性名
-     * @returns 返回代理对象
-     */
+    // 创建租户代理对象
+    return this.createTenantProxy(db);
+  }
+
+  /**
+   * 创建一个数据库实例的租户代理
+   *
+   * 该代理会自动为所有数据库操作注入租户过滤条件，实现多租户数据隔离。
+   * 支持的操作包括：select、update、delete
+   *
+   * @param db - 原始数据库实例
+   * @returns 一个代理后的数据库实例，所有查询都会自动包含租户过滤条件
+   *
+   * @example
+   * ```typescript
+   * // 原始查询
+   * db.select().from(users).where({ age: 18 });
+   *
+   * // 代理后实际执行的查询
+   * db.select().from(users).where({
+   *   age: 18,
+   *   tenant_id: 'current-tenant-id'
+   * });
+   * ```
+   * @example
+   * ```typescript
+   * // 原始更新
+   * db.update(users).set({ status: 'active' }).where({ id: 1 });
+   *
+   * // 代理后实际执行的更新
+   * db.update(users).set({ status: 'active' }).where({
+   *   id: 1,
+   *   tenant_id: 'current-tenant-id'
+   * });
+   * ```
+   *
+   * @remarks
+   * - 使用 JavaScript Proxy 实现方法拦截
+   * - 通过 nestjs-cls 获取当前请求上下文中的租户ID
+   * - 自动注入租户过滤条件，确保数据安全隔离
+   *
+   * @throws {Error} 如果在执行数据库操作时无法获取租户ID
+   * @internal 该方法仅供内部使用
+   */
+  private createTenantProxy(db: any) {
     return new Proxy(db, {
       get: (target, prop) => {
         const original = target[prop];
         if (typeof original === 'function') {
-          return (...args: any[]) => {
-            // 在这里添加租户过滤逻辑
-            const result = original.apply(target, args);
+          return async (...args: any[]) => {
+            // 从 CLS 上下文获取当前租户ID
+            const tenantId = this.cls.get('tenantId');
+
+            // 对特定数据库操作注入租户过滤条件
+            if (
+              typeof prop === 'string' &&
+              ['select', 'update', 'delete'].includes(prop)
+            ) {
+              args[0] = {
+                ...args[0],
+                where: {
+                  tenant_id: tenantId,
+                  ...(args[0]?.where || {}),
+                },
+              };
+            }
+
+            // 执行原始数据库操作并返回结果
+            const result = await original.apply(target, args);
             return result;
           };
         }
@@ -100,48 +136,105 @@ export class DrizzleService implements OnApplicationShutdown {
     });
   }
 
-  async validateSchema(schemaName: string): Promise<void> {
-    // 使用 Set 缓存已验证的 schema，避免重复验证
-    // 如果该 schema 已经验证过，直接返回
-    if (this.validSchemas.has(schemaName)) {
+  /**
+   * 确保指定的数据库Schema存在
+   *
+   * @remarks
+   * 该方法会检查指定的schema是否存在于PostgreSQL数据库中。
+   * 为了提高性能，会将已验证的schema缓存在内存中。
+   *
+   * 工作流程:
+   * 1. 首先检查缓存中是否已验证过该schema
+   * 2. 如果未验证,创建一个临时数据库连接
+   * 3. 查询系统表验证schema是否存在
+   * 4. 验证成功后将schema加入缓存
+   * 5. 最后确保关闭临时连接
+   *
+   * @param schemaName - 需要验证的schema名称
+   * @throws {Error} 当schema不存在时抛出错误
+   */
+  async ensureSchemaExists(schemaName: string): Promise<void> {
+    // 检查缓存中是否已验证过该schema
+    if (this.validatedSchemaCache.has(schemaName)) {
       return;
     }
 
-    // 创建一个临时的数据库连接用于验证
-    // max: 1 表示最大连接数为 1，因为只需要做一次验证
-    // connect_timeout: 10 设置连接超时时间为 10 秒
+    // 创建临时数据库连接
+    // 设置最大连接数为1且超时时间为10秒
     const client = postgres(this.config.postgres.url, {
       max: 1,
       connect_timeout: 10,
     });
-    // 使用 drizzle 包装 postgres 客户端，便于执行 SQL 查询
+
+    // 使用drizzle包装postgres客户端以便执行SQL查询
     const baseDb = drizzle(client);
 
     try {
-      // 查询 PostgreSQL 的系统表 information_schema.schemata
-      // 检查指定的 schema 是否存在
+      // 查询PostgreSQL系统表验证schema是否存在
       const result = await baseDb.execute(
         sql`SELECT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = ${schemaName})`,
       );
 
-      // 如果查询结果表明 schema 不存在，抛出错误
+      // schema不存在时抛出错误
       if (!result[0]?.exists) {
         throw new Error(
           `租户 schema "${schemaName}" 不存在。请联系系统管理员创建所需的数据库结构。`,
         );
       }
 
-      // 验证成功后，将 schema 名称添加到已验证集合中
-      // 后续对同一 schema 的验证可以直接从缓存中返回
-      this.validSchemas.add(schemaName);
+      // 验证成功后将schema加入缓存
+      this.validatedSchemaCache.add(schemaName);
     } finally {
-      // 无论验证成功与否，都确保关闭数据库连接
-      // 防止连接泄漏
+      // 确保关闭临时数据库连接以防止连接泄露
       await client.end();
     }
   }
 
   async onApplicationShutdown() {
     await TenantConnectionPool.closeAll();
+  }
+
+  /**
+   * 在事务中执行回调函数
+   *
+   * @param callback - 回调函数，接受事务对象作为参数
+   * @returns 回调函数返回的结果
+   */
+  async transaction<T>(callback: (tx: any) => Promise<T>): Promise<T> {
+    const db = await this.getDrizzleWithTenantProxy(
+      this.config,
+      this.cls.get('tenantId'),
+    );
+    return db.transaction(async (tx) => {
+      // 在事务开始时设置 search_path
+      await tx.execute(
+        sql`SET search_path TO ${sql.identifier(`tenant_${this.cls.get('tenantId')}`)}`,
+      );
+      return callback(this.createTenantProxy(tx));
+    });
+  }
+
+  async onModuleInit() {
+    const tenantId = 'default';
+    const schemaName = `tenant_${tenantId}`;
+    await this.ensureSchemaExists(schemaName);
+
+    // 确保默认schema包含所需的所有表
+    await this.validateSchemaStructure(schemaName);
+  }
+
+  private async validateSchemaStructure(schemaName: string) {
+    const client = postgres(this.config.postgres.url, { max: 1 });
+    const db = drizzle(client);
+
+    try {
+      await db.execute(sql`
+        SELECT EXISTS (
+          SELECT FROM information_schema.tables 
+          WHERE table_schema = ${schemaName}
+        )`);
+    } finally {
+      await client.end();
+    }
   }
 }

@@ -75,8 +75,11 @@ export class DrizzleModule {
               throw new Error('Tenant ID is required');
             }
             const schemaName = `tenant_${tenantId}`;
-            await drizzleService.validateSchema(schemaName);
-            return drizzleService.getDrizzle(drizzleConfig, tenantId);
+            await drizzleService.ensureSchemaExists(schemaName);
+            return drizzleService.getDrizzleWithTenantProxy(
+              drizzleConfig,
+              tenantId,
+            );
           },
           inject: [DrizzleService, TenantContextService],
         },
@@ -116,17 +119,24 @@ export class DrizzleModule {
           provide: TENANT_PG_CONNECTION,
           scope: Scope.REQUEST,
           useFactory: async (
-            drizzleService: DrizzleService,
-            drizzleConfig: DrizzleModuleConfig,
-            tenantContext: TenantContextService,
+            drizzleService: DrizzleService, // Drizzle服务实例
+            drizzleConfig: DrizzleModuleConfig, // Drizzle配置
+            tenantContext: TenantContextService, // 租户上下文服务
           ) => {
+            // 获取当前租户ID
             const tenantId = tenantContext.getTenantId();
             if (!tenantId) {
               throw new Error('Tenant ID is required');
             }
+            // 根据租户ID构建schema名称
             const schemaName = `tenant_${tenantId}`;
-            await drizzleService.validateSchema(schemaName);
-            return drizzleService.getDrizzle(drizzleConfig, tenantId);
+            // 确保该租户的schema存在
+            await drizzleService.ensureSchemaExists(schemaName);
+            // 返回带有租户代理的Drizzle实例
+            return drizzleService.getDrizzleWithTenantProxy(
+              drizzleConfig,
+              tenantId,
+            );
           },
           inject: [DrizzleService, 'DRIZZLE_OPTIONS', TenantContextService],
         },

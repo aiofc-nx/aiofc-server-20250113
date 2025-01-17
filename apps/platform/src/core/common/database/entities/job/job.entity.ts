@@ -33,18 +33,7 @@ export const jobs = pgTable(
   },
   (jobs) => [
     index('name_idx').on(jobs.name),
+    index('tenant_id_idx').on(jobs.tenantId),
     check('tenant_id_not_empty', sql`tenant_id != ''`),
   ],
 );
-
-/**
- * 类型定义
- *
- * JobEntity: 用于查询时的完整实体类型
- * JobEntityInsert: 用于插入数据时的类型(可选字段)
- */
-export type JobEntity = typeof jobs.$inferSelect;
-export type JobEntityInsert = {
-  name: string;
-  tenantId: string;
-};

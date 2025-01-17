@@ -37,15 +37,15 @@ import { ClsService } from 'nestjs-cls';
  * - 通过正则表达式验证租户ID格式
  */
 @Injectable()
-export class TenantMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(TenantMiddleware.name);
+export class TenantIdentificationMiddleware implements NestMiddleware {
+  private readonly logger = new Logger(TenantIdentificationMiddleware.name);
   private readonly EXCLUDED_PATHS = ['/health', '/metrics', '/docs'];
 
   constructor(
     private readonly tenantContextService: TenantContextService,
     private readonly cls: ClsService,
   ) {
-    this.logger.log('构建TenantMiddleware');
+    this.logger.log('构建TenantIdentificationMiddleware');
   }
   // 判断请求路径是否在排除列表中,有些路径不需要租户隔离
   private isExcludedPath(path: string): boolean {
@@ -61,7 +61,7 @@ export class TenantMiddleware implements NestMiddleware {
 
   // 中间件执行逻辑
   use(req: Request, _res: Response, next: NextFunction) {
-    this.logger.log('TenantMiddleware executing...');
+    this.logger.log('TenantIdentificationMiddleware executing...');
     this.logger.log(`Path: ${req.path}, OriginalUrl: ${req.originalUrl}`);
     this.logger.log(`Headers: ${this.formatHeaders(req.headers)}`);
 
@@ -87,7 +87,7 @@ export class TenantMiddleware implements NestMiddleware {
       this.cls.set('tenantId', tenantId);
       next();
     } catch (error) {
-      this.logger.error('Error in TenantMiddleware:', error);
+      this.logger.error('Error in TenantIdentificationMiddleware:', error);
       next(error);
     }
   }

@@ -1,9 +1,6 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import {
-  JobEntity,
-  JobEntityInsert,
-} from '../../../core/common/database/entities/job/job.entity';
 import { JobDao } from '../../../core/common/database/entities/job/job.dao';
+import { Job, NewJob } from '@aiofc/drizzle-schema';
 
 /**
  * Jobs服务层
@@ -41,11 +38,11 @@ export class JobsService {
    * - 接收工作名称作为参数
    * - 返回插入的记录信息
    */
-  async addJob(jobName: string, tenantId: string): Promise<JobEntityInsert> {
+  async addJob(jobName: string, tenantId: string): Promise<NewJob> {
     return await this.jobDao.insertNewRecord({
       name: jobName,
       tenantId,
-    } as JobEntityInsert);
+    } as NewJob);
   }
 
   /**
@@ -55,7 +52,7 @@ export class JobsService {
    * - 指定返回的字段列表
    * - 类型转换确保返回正确的实体类型
    */
-  async getById(id: string): Promise<JobEntity> {
+  async getById(id: string): Promise<Job> {
     if (!id) {
       throw new BadRequestException('Job ID is required');
     }
@@ -66,7 +63,7 @@ export class JobsService {
       'createdAt',
       'updatedAt',
       'name',
-    ])) as JobEntity;
+    ])) as Job;
   }
 
   /**
@@ -76,7 +73,7 @@ export class JobsService {
    * - 支持部分字段更新
    * - 返回更新后的记录数组
    */
-  async updateJob(id: string, newName: string): Promise<JobEntityInsert[]> {
+  async updateJob(id: string, newName: string): Promise<NewJob[]> {
     if (!id) {
       throw new BadRequestException('Job ID is required');
     }
@@ -89,7 +86,7 @@ export class JobsService {
    * 要点:
    * - 返回完整的实体数组
    */
-  async getAllJobs(): Promise<JobEntity[]> {
+  async getAllJobs(): Promise<Job[]> {
     this.logger.log('获得所有工作事项');
     return this.jobDao.getAll();
   }
@@ -101,7 +98,7 @@ export class JobsService {
    * - 根据ID删除单条记录
    * - 返回受影响的记录数组
    */
-  async deleteJob(id: string): Promise<JobEntityInsert[]> {
+  async deleteJob(id: string): Promise<NewJob[]> {
     if (!id) {
       throw new BadRequestException('Job ID is required');
     }
@@ -115,7 +112,7 @@ export class JobsService {
    * - 批量删除操作
    * - 返回受影响的记录数组
    */
-  async deleteJobs(): Promise<JobEntityInsert[]> {
+  async deleteJobs(): Promise<NewJob[]> {
     return await this.jobDao.deleteAll();
   }
 }

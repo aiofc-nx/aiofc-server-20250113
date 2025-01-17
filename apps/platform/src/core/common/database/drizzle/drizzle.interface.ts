@@ -11,7 +11,7 @@ import { Options, PostgresType } from 'postgres';
  *
  * @property postgres - PostgreSQL数据库连接配置
  * @property postgres.url - 数据库连接URL字符串
- * @property postgres.config - postgres.js的连接配置选项(可选)
+ * @property postgres.config - 连接配置选项(可选)
  * @property schema - 数据库schema定义(可选)
  * @property config - Drizzle ORM的配置选项(可选)
  * @property tag - 用于标识特定连接池的标签(可选)
