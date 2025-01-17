@@ -1,4 +1,4 @@
-import { timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { timestamp, uuid, varchar, check, index } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
 
 // 主键
@@ -19,13 +19,19 @@ export const tracked = {
 };
 
 // 租户ID
-// export const tenantIdPk = {
-//   id: uuid('tenant_id').primaryKey().default(sql.raw(`gen_random_uuid()`)),
-// };
-
 export const tenantId = {
   tenantId: varchar('tenant_id', { length: 50 }).notNull(),
 };
+
+// 添加表级别的check约束helper
+export const tenantChecks = (table: any) => ({
+  notEmpty: () => check('tenant_id_not_empty', sql`tenant_id != ''`),
+});
+
+// 添加租户相关的索引helper
+export const tenantIndexes = (table: any) => ({
+  byTenantId: (name = 'tenant_id_idx') => index(name).on(table.tenantId),
+});
 
 export const common = {
   ...idPk,

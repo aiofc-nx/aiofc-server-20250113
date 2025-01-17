@@ -1,6 +1,10 @@
 apps/drizzle-kits
 # apps/saas
 packages/nestjs-drizzle
-packages/utils
 # apps/platform
 astro
+examples/zod-demo
+# packages/drizzle-schema
+# packages/pino-logger
+# packages/zod-env
+packages/utils

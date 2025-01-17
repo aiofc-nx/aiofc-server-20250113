@@ -5,8 +5,6 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Logger } from '@aiofc/pino-logger';
-import { JobsModule } from './modules/jobs/jobs.module';
-import { TenantIdentificationMiddleware } from '../core/common/tenant/tenant.middleware';
 import { TenantContextService } from '../core/common/tenant/tenant-context.service';
 import { ClsMiddleware, ClsModule, ClsService } from 'nestjs-cls';
 import {
@@ -19,7 +17,8 @@ import { AppConfig } from '../config/app-config.service';
 import { ZodConfigModule } from '../config/zod-config.module';
 import { PinoLoggerModule } from '@aiofc/pino-logger';
 import { TenantDatabaseModule } from '../core/common/database/tenant-database.module';
-import { TenantValidationMiddleware } from '../core/common/database/database-context.middleware';
+import { TenantValidationMiddleware } from '../core/common/database/tenant-validation.middleware';
+import { TenantIdentificationMiddleware } from '../core/common/tenant/tenant-identification.middleware';
 
 const loggerOptions: PrettyOptions = {
   colorize: true,
@@ -50,7 +49,7 @@ const loggerOptions: PrettyOptions = {
     ZodConfigModule,
     PinoLoggerModule,
     // 任务模块
-    JobsModule,
+    // JobsModule,
     TenantDatabaseModule,
   ],
   providers: [

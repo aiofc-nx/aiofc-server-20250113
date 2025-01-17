@@ -4,6 +4,5 @@
     "outDir": "../../dist/out-tsc",
     "declaration": true,
     "types": ["node"]
-  },
-  "include": ["src/**/*.ts", "../../apps/platform/src/config/z-env-schema.ts"]
+  }
 }
