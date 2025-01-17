@@ -41,7 +41,7 @@ export class JobsService {
   async addJob(jobName: string, tenantId: string): Promise<NewJob> {
     return await this.jobDao.insertNewRecord({
       name: jobName,
-      tenantId,
+      tenantId: tenantId,
     } as NewJob);
   }
 

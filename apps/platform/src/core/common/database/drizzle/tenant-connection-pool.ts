@@ -46,27 +46,45 @@ export class TenantConnectionPool {
       const poolKey = `tenant_${tenantId}`;
 
       if (!this.pools.has(poolKey)) {
-        // 根据schema生成连接完整的URL，从而实现租户数据的schema隔离
-        const url = `${config.postgres.url}?options=-c%20search_path=${poolKey}`;
-        const client = postgres(url, {
-          ...config.postgres.config,
-          max: 10, // 最大连接数
-          idle_timeout: 20, // 空闲超时(秒)
-          connect_timeout: 10, // 连接超时(秒)
-        });
-        const db = drizzle(client);
+        if (!config?.postgres?.url) {
+          throw new Error('Database connection URL is required');
+        }
 
-        // 验证schema权限
-        await db.execute(sql`SELECT current_schema()`);
+        // 构建带有 schema 的 URL
+        const url = new URL(config.postgres.url);
+        url.searchParams.set('search_path', poolKey);
+
+        const client = postgres(url.toString(), {
+          ...config.postgres.config,
+          max: 10,
+          idle_timeout: 20,
+          connect_timeout: 10,
+        });
+
+        // 创建 drizzle 实例
+        const db = drizzle(client, {
+          // 添加必要的 drizzle 配置
+          logger: true,
+        });
+
+        // 验证连接和 schema
+        await db.execute(sql`
+          SELECT current_schema();
+        `);
 
         this.pools.set(poolKey, { db, client });
         this.logger.info(
-          { tenantId },
+          { tenantId, poolKey },
           'Created new connection pool for tenant',
         );
       }
 
-      return this.pools.get(poolKey).db;
+      const pool = this.pools.get(poolKey);
+      if (!pool?.db) {
+        throw new Error('Failed to initialize database connection');
+      }
+
+      return pool.db;
     } catch (error) {
       this.logger.error(
         { tenantId, error },

@@ -17,11 +17,7 @@ import { TENANT_PG_CONNECTION } from '../drizzle/drizzle.constants';
  * - InferEntitySelected: 查询结果类型
  * - InferEntityInsert: 插入数据类型
  */
-export class AbstractDao<
-  Entity extends Table,
-  InferEntitySelected,
-  InferEntityInsert,
-> {
+export class AbstractDao<Entity extends Table, InferEntityInsert> {
   constructor(
     @Inject(TENANT_PG_CONNECTION) protected readonly db: PostgresJsDatabase,
     private readonly entity: Entity,
@@ -31,7 +27,7 @@ export class AbstractDao<
    * 获取所有记录
    */
   async getAll() {
-    return this.db.select().from(this.entity).execute();
+    return this.db.select().from(this.entity);
   }
 
   /**
@@ -41,13 +37,9 @@ export class AbstractDao<
    * - 支持选择性返回字段
    * - 使用eq进行相等条件查询
    */
-  async getById(
-    id: string,
-    fieldsToSelect?: (keyof Entity)[],
-  ): Promise<Partial<InferEntitySelected>[]> {
-    const selectedFields = this.selectFields(fieldsToSelect);
-    return this.db
-      .select(selectedFields)
+  async getById(id: string, fieldsToSelect?: (keyof Entity)[]) {
+    return await this.db
+      .select(this.selectFields(fieldsToSelect))
       .from(this.entity)
       .where(eq(this.entity['id'], id));
   }
@@ -55,10 +47,7 @@ export class AbstractDao<
   /**
    * 根据ID获取单条记录
    */
-  async getOneById(
-    id: string,
-    fieldsToSelect?: (keyof Entity)[],
-  ): Promise<Partial<InferEntitySelected>> {
+  async getOneById(id: string, fieldsToSelect?: (keyof Entity)[]) {
     const res = await this.getById(id, fieldsToSelect);
     return res && res.length > 0 ? res[0] : null;
   }
@@ -70,13 +59,11 @@ export class AbstractDao<
     key: keyof Entity,
     value: any,
     fieldsToSelect?: (keyof Entity)[],
-  ): Promise<Partial<InferEntitySelected>[]> {
-    const selectedFields = this.selectFields(fieldsToSelect);
+  ) {
     return await this.db
-      .select(selectedFields)
+      .select(this.selectFields(fieldsToSelect))
       .from(this.entity)
-      .where(eq(this.entity[key as string], value))
-      .execute();
+      .where(eq(this.entity[key as string], value));
   }
 
   /**
@@ -86,7 +73,7 @@ export class AbstractDao<
     key: keyof Entity,
     value: any,
     fieldsToSelect?: (keyof Entity)[],
-  ): Promise<Partial<InferEntitySelected>> {
+  ) {
     const bySingleKey = await this.getBySingleKey(key, value, fieldsToSelect);
     return bySingleKey && bySingleKey.length > 0 ? bySingleKey.at(-1) : null;
   }
@@ -145,9 +132,12 @@ export class AbstractDao<
     if (!fieldsToSelect) {
       return undefined;
     }
-    return fieldsToSelect.reduce((acc, fieldToSelect) => {
-      acc[fieldToSelect as string] = this.entity[fieldToSelect];
-      return acc;
-    }, {});
+    return fieldsToSelect.reduce(
+      (acc, field) => {
+        acc[field as string] = this.entity[field as string];
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
   }
 }
