@@ -5,6 +5,7 @@ import { DrizzleModuleConfig } from './drizzle.interface';
 import { sql } from 'drizzle-orm';
 import { TenantConnectionPool } from './tenant-connection-pool';
 import { ClsService } from 'nestjs-cls';
+import { eq } from 'drizzle-orm';
 
 /**
  * DrizzleService 类
@@ -41,13 +42,18 @@ export class DrizzleService implements OnApplicationShutdown {
    * 使用 Set 来存储已验证过的 schema 名称，避免重复验证
    */
   private validatedSchemaCache = new Set<string>();
+  private db: any; // 添加 db 属性
+  private queryFilter: { tenantId: string } | null = null; // 添加 queryFilter 属性
+
   // 构造函数，用于注入 DrizzleModuleConfig
   constructor(
     // 根据令牌配置config
     @Inject('DRIZZLE_OPTIONS')
     private readonly config: DrizzleModuleConfig,
     private readonly cls: ClsService,
-  ) {}
+  ) {
+    this.db = drizzle(postgres(this.config.postgres.url));
+  }
 
   public async getDrizzleWithTenantProxy(
     options: DrizzleModuleConfig,
@@ -236,5 +242,27 @@ export class DrizzleService implements OnApplicationShutdown {
     } finally {
       await client.end();
     }
+  }
+
+  async setTenantContext(tenantId: string) {
+    // 切换Schema
+    await this.db.execute(sql`SET search_path TO tenant_${tenantId}`);
+  }
+
+  setQueryFilter(filter: { tenantId: string }) {
+    // 设置全局查询过滤器
+    this.queryFilter = filter;
+  }
+
+  // 在执行查询时应用过滤器
+  async executeQuery(query: any) {
+    if (this.queryFilter) {
+      query = query.where(eq(query.table.tenantId, this.queryFilter.tenantId));
+    }
+    return query;
+  }
+
+  async execute(query: any) {
+    return this.db.execute(query);
   }
 }
